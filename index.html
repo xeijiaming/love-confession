@@ -1634,145 +1634,125 @@ const chatSend = document.getElementById('chatSend');
 const chatMessages = document.getElementById('chatMessages');
 const apiKeyInput = document.getElementById('apiKeyInput');
 
-// Load saved API key
 let apiKey = localStorage.getItem('nexusai_deepseek_key') || '';
-if (apiKey) apiKeyInput.value = apiKey;
-apiKeyInput.addEventListener('change', () => {
-  apiKey = apiKeyInput.value.trim();
+if (apiKey && apiKeyInput) apiKeyInput.value = apiKey;
+if (apiKeyInput) apiKeyInput.addEventListener('input', function() {
+  apiKey = this.value.trim();
   if (apiKey) localStorage.setItem('nexusai_deepseek_key', apiKey);
   else localStorage.removeItem('nexusai_deepseek_key');
 });
 
-const chatReplies = [
-  { kw: ['hello','hi','hey'], reply: 'Hey! I am NexusAI assistant. How can I help with your creative project today?' },
-  { kw: ['你好','嗨','在吗','嗨喽'], reply: '你好！我是 NexusAI 创意助手，可以帮你优化提示词、解答 AI 创作问题、或者聊聊你的创意想法～' },
-  { kw: ['画','image','picture','generate','生成','创作','图','绘画'], reply: '打开 Demo 面板的「AI 绘画」模式，输入你想要的画面描述——主体、风格、光线、氛围越详细，生成效果越好。试试看吧！' },
-  { kw: ['web','网页','site','网站','页面','落地页'], reply: '在 Demo 面板选「AI 网页」模式，输入网站描述就能生成完整预览，包含导航、Hero 区域和功能卡片。' },
-  { kw: ['design','设计','logo','brand','品牌','标志'], reply: 'AI 设计模式可以一键生成完整品牌系统——Logo、配色方案、字体层级和 UI 组件预览。' },
-  { kw: ['prompt','提示词','提示','优化','怎么写'], reply: '好提示词 = 主体 + 风格 + 细节 + 氛围。比如：「夕阳下的赛博朋克城市，霓虹灯光映在玻璃大楼上，电影级光影，8K超清」。试试这个模板！' },
-  { kw: ['thanks','谢谢','感谢','thx','棒','厉害'], reply: '不客气！继续用 NexusAI 创作吧 🚀' },
-  { kw: ['price','价格','收费','free','免费','钱'], reply: 'NexusAI 目前完全免费公测，所有功能——AI 绘画、网页生成、品牌设计——都不收费。' },
-  { kw: ['风格','style','有哪些'], reply: '支持 6 种风格：自动（智能匹配）、写实、动漫、油画、水彩、像素。在 AI 绘画模式下可以切换！' },
-  { kw: ['你是谁','你是什么','你的名字','叫什么'], reply: '我是 NexusAI 的内置创意助手，专门帮你更好地使用这个 AI 创作平台。我懂中英文，随便聊～' },
-];
-
-function isChinese(text) {
-  return /[一-鿿]/.test(text);
-}
-
-function getChatReply(msg) {
-  const lower = msg.toLowerCase();
-  for (let r of chatReplies) {
-    if (r.kw.some(k => lower.includes(k))) return r.reply;
-  }
-  const cnFallbacks = [
-    '有意思！可以说说你具体想创作什么吗？',
-    '建议试试 AI 绘画 Demo，输入一个详细的提示词，效果会很惊艳！',
-    '好想法！你试过实时预览功能吗？输入 3 个字就会自动生成。',
-    '这个方向很棒！要不要在 Demo 面板里试一下？选一个风格效果更佳。',
-    'NexusAI 支持写实、动漫、油画、水彩、像素等多种风格，你喜欢哪种？',
-  ];
-  const enFallbacks = [
-    'Interesting! Tell me more about what kind of creation you have in mind.',
-    'Try the AI painting demo with a detailed prompt — you might be surprised!',
-    'That sounds creative! Have you tried the live preview feature yet?',
-    'Good question! Our AI engine supports realistic, anime, oil, watercolor, and pixel art styles.',
-  ];
-  const pool = isChinese(msg) ? cnFallbacks : enFallbacks;
-  return pool[Math.floor(Math.random() * pool.length)];
-}
-
-async function callDeepSeekAPI(messages) {
-  const resp = await fetch('https://api.deepseek.com/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer ' + apiKey
-    },
-    body: JSON.stringify({
-      model: 'deepseek-chat',
-      messages: messages,
-      max_tokens: 500,
-      temperature: 0.8
-    })
-  });
-  if (!resp.ok) {
-    const err = await resp.text();
-    throw new Error('API error ' + resp.status + ': ' + err.slice(0,150));
-  }
-  const data = await resp.json();
-  return data.choices[0].message.content;
-}
-
 let conversationHistory = [];
 
-function addChatMessage(text, role) {
-  const div = document.createElement('div');
-  div.className = `chat-msg ${role}`;
-  div.textContent = text;
-  chatMessages.appendChild(div);
+function addChatMsg(text, role) {
+  var d = document.createElement('div');
+  d.className = 'chat-msg ' + role;
+  d.textContent = text;
+  chatMessages.appendChild(d);
   chatMessages.scrollTop = chatMessages.scrollHeight;
 }
 
-function showChatTyping() {
-  const div = document.createElement('div');
-  div.className = 'chat-typing';
-  div.id = 'chatTyping';
-  div.innerHTML = '<span></span><span></span><span></span>';
-  chatMessages.appendChild(div);
+function showTyping() {
+  var d = document.createElement('div');
+  d.className = 'chat-typing';
+  d.id = 'chatTyping';
+  d.innerHTML = '<span></span><span></span><span></span>';
+  chatMessages.appendChild(d);
   chatMessages.scrollTop = chatMessages.scrollHeight;
 }
 
-function hideChatTyping() {
-  const el = document.getElementById('chatTyping');
+function hideTyping() {
+  var el = document.getElementById('chatTyping');
   if (el) el.remove();
 }
 
-async function sendChat() {
-  const msg = chatInput.value.trim();
+function isCN(text) {
+  return /[一-鿿]/.test(text);
+}
+
+function getReply(msg) {
+  var lower = msg.toLowerCase();
+  var replies = [
+    { kw: ['hello','hi','hey'], r: 'Hey! I am NexusAI assistant. How can I help?' },
+    { kw: ['你好','嗨','在吗'], r: '你好！我是 NexusAI 创意助手，可以帮你优化提示词、解答 AI 创作问题～' },
+    { kw: ['画','image','生成','创作','图','绘画'], r: '打开 Demo 面板的「AI 绘画」模式，输入画面描述即可生成！主体、风格、光线、氛围越详细，效果越好。' },
+    { kw: ['web','网页','网站','页面','落地页'], r: '在 Demo 面板选「AI 网页」模式，输入网站描述就能生成完整预览。' },
+    { kw: ['design','设计','logo','brand','品牌','标志'], r: 'AI 设计模式可以一键生成完整品牌系统——Logo、配色、字体、UI 组件。' },
+    { kw: ['prompt','提示词','怎么写'], r: '好提示词 = 主体 + 风格 + 细节 + 氛围。比如：「夕阳下的赛博朋克城市，霓虹灯光映在玻璃大楼上，电影级光影，8K超清」' },
+    { kw: ['谢谢','感谢','thx','棒','厉害'], r: '不客气！继续用 NexusAI 创作吧！' },
+    { kw: ['价格','收费','免费','钱'], r: 'NexusAI 目前完全免费公测，所有功能都不收费。' },
+    { kw: ['风格','style'], r: '支持 6 种风格：自动、写实、动漫、油画、水彩、像素。AI 绘画模式下可切换！' },
+    { kw: ['你是谁','叫什么'], r: '我是 NexusAI 内置创意助手，懂中英文，随便聊～' },
+  ];
+  for (var i = 0; i < replies.length; i++) {
+    for (var j = 0; j < replies[i].kw.length; j++) {
+      if (lower.indexOf(replies[i].kw[j]) !== -1) return replies[i].r;
+    }
+  }
+  var pool = isCN(msg)
+    ? ['有意思！说说你想创作什么？', '试试 AI 绘画 Demo 吧，效果很惊艳！', '好想法！用过实时预览功能吗？']
+    : ['Interesting! Tell me more.', 'Try the AI painting demo!', 'Have you tried live preview?'];
+  return pool[Math.floor(Math.random() * pool.length)];
+}
+
+async function callDeepSeek(messages) {
+  var resp = await fetch('https://api.deepseek.com/chat/completions', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + apiKey },
+    body: JSON.stringify({ model: 'deepseek-chat', messages: messages, max_tokens: 500, temperature: 0.8 })
+  });
+  if (!resp.ok) {
+    var errText = await resp.text();
+    throw new Error('HTTP ' + resp.status + ': ' + errText.slice(0, 100));
+  }
+  var data = await resp.json();
+  return data.choices[0].message.content;
+}
+
+function sendChat() {
+  var msg = chatInput.value.trim();
   if (!msg) return;
-  addChatMessage(msg, 'user');
+  addChatMsg(msg, 'user');
   chatInput.value = '';
-  showChatTyping();
+  showTyping();
 
   if (apiKey) {
-    // Use DeepSeek API
-    try {
-      conversationHistory.push({ role: 'user', content: msg });
-      // Keep last 10 messages for context
-      if (conversationHistory.length > 10) conversationHistory = conversationHistory.slice(-10);
-      const systemMsg = { role: 'system', content: '你是 NexusAI 创意助手。用与用户相同的语言回复。帮助用户进行AI绘画、网页生成、品牌设计等创意工作。保持热情、有洞察力。回复控制在200字以内。' };
-      const reply = await callDeepSeekAPI([systemMsg, ...conversationHistory]);
+    conversationHistory.push({ role: 'user', content: msg });
+    if (conversationHistory.length > 10) conversationHistory = conversationHistory.slice(-10);
+    var systemMsg = { role: 'system', content: '你是 NexusAI 创意助手。用与用户相同的语言回复。帮助用户进行AI绘画、网页生成、品牌设计等创意工作。保持热情、有洞察力。回复控制在200字以内。' };
+    callDeepSeek([systemMsg].concat(conversationHistory)).then(function(reply) {
       conversationHistory.push({ role: 'assistant', content: reply });
-      hideChatTyping();
-      addChatMessage(reply, 'ai');
-    } catch (e) {
-      hideChatTyping();
-      console.error('DeepSeek API error:', e);
-      addChatMessage('API 调用失败: ' + e.message + '。已切回本地模式。', 'ai');
-      // Fallback to keyword
-      addChatMessage(getChatReply(msg), 'ai');
+      hideTyping();
+      addChatMsg(reply, 'ai');
+    }).catch(function(e) {
+      hideTyping();
+      console.error('API error:', e);
+      addChatMsg('DeepSeek API 调用失败: ' + e.message, 'ai');
+      addChatMsg(getReply(msg), 'ai');
       apiKey = '';
-      apiKeyInput.value = '';
+      if (apiKeyInput) apiKeyInput.value = '';
       localStorage.removeItem('nexusai_deepseek_key');
-    }
+    });
   } else {
-    // Keyword fallback
-    setTimeout(() => {
-      hideChatTyping();
-      addChatMessage(getChatReply(msg), 'ai');
-    }, 800 + Math.random() * 1200);
+    setTimeout(function() {
+      hideTyping();
+      addChatMsg(getReply(msg), 'ai');
+    }, 600 + Math.random() * 800);
   }
-}chatSend.addEventListener('click', sendChat);
-chatInput.addEventListener('keydown', e => { if (e.key === 'Enter') sendChat(); });
+}
 
-chatFab.addEventListener('click', () => {
-  const open = chatPanel.classList.toggle('open');
-  chatFab.style.opacity = open ? '0' : '1';
-  if (open) setTimeout(() => chatInput.focus(), 300);
+chatSend.addEventListener('click', sendChat);
+chatInput.addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') sendChat();
 });
 
-chatClose.addEventListener('click', () => {
+chatFab.addEventListener('click', function() {
+  var open = chatPanel.classList.toggle('open');
+  chatFab.style.opacity = open ? '0' : '1';
+  if (open) setTimeout(function() { chatInput.focus(); }, 300);
+});
+
+chatClose.addEventListener('click', function() {
   chatPanel.classList.remove('open');
   chatFab.style.opacity = '1';
 });
