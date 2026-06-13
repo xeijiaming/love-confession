@@ -884,7 +884,10 @@ body {
 <div class="chat-panel" id="chatPanel">
   <div class="chat-header">
     <span class="chat-header-title">🤖 NexusAI 助手</span>
-    <button class="chat-header-close" id="chatClose">✕</button>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <input class="api-key-input" id="apiKeyInput" placeholder="🔑 API Key" style="width:120px;padding:4px 8px;border-radius:8px;border:1px solid var(--glass-border);background:var(--glass);color:var(--text-primary);font-size:0.7rem;outline:none;" />
+      <button class="chat-header-close" id="chatClose">✕</button>
+    </div>
   </div>
   <div class="chat-messages" id="chatMessages">
     <div class="chat-msg ai">你好！我是 NexusAI 创意助手。可以帮你优化提示词、解答问题、或者聊聊你的创意想法 ✨</div>
@@ -1629,6 +1632,16 @@ const chatClose = document.getElementById('chatClose');
 const chatInput = document.getElementById('chatInput');
 const chatSend = document.getElementById('chatSend');
 const chatMessages = document.getElementById('chatMessages');
+const apiKeyInput = document.getElementById('apiKeyInput');
+
+// Load saved API key
+let apiKey = localStorage.getItem('nexusai_deepseek_key') || '';
+if (apiKey) apiKeyInput.value = apiKey;
+apiKeyInput.addEventListener('change', () => {
+  apiKey = apiKeyInput.value.trim();
+  if (apiKey) localStorage.setItem('nexusai_deepseek_key', apiKey);
+  else localStorage.removeItem('nexusai_deepseek_key');
+});
 
 const chatReplies = [
   { kw: ['hello','hi','hey'], reply: 'Hey! I am NexusAI assistant. How can I help with your creative project today?' },
@@ -1669,41 +1682,66 @@ function getChatReply(msg) {
   return pool[Math.floor(Math.random() * pool.length)];
 }
 
-function addChatMessage(text, role) {
-  const div = document.createElement('div');
-  div.className = `chat-msg ${role}`;
-  div.textContent = text;
-  chatMessages.appendChild(div);
-  chatMessages.scrollTop = chatMessages.scrollHeight;
+async function callDeepSeekAPI(messages) {
+  const resp = await fetch('https://api.deepseek.com/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + apiKey
+    },
+    body: JSON.stringify({
+      model: 'deepseek-chat',
+      messages: messages,
+      max_tokens: 500,
+      temperature: 0.8
+    })
+  });
+  if (!resp.ok) {
+    const err = await resp.text();
+    throw new Error('API error ' + resp.status + ': ' + err.slice(0,150));
+  }
+  const data = await resp.json();
+  return data.choices[0].message.content;
 }
 
-function showChatTyping() {
-  const div = document.createElement('div');
-  div.className = 'chat-typing';
-  div.id = 'chatTyping';
-  div.innerHTML = '<span></span><span></span><span></span>';
-  chatMessages.appendChild(div);
-  chatMessages.scrollTop = chatMessages.scrollHeight;
-}
+let conversationHistory = [];
 
-function hideChatTyping() {
-  const el = document.getElementById('chatTyping');
-  if (el) el.remove();
-}
-
-function sendChat() {
+async function sendChat() {
   const msg = chatInput.value.trim();
   if (!msg) return;
   addChatMessage(msg, 'user');
   chatInput.value = '';
   showChatTyping();
-  setTimeout(() => {
-    hideChatTyping();
-    addChatMessage(getChatReply(msg), 'ai');
-  }, 800 + Math.random() * 1200);
-}
 
-chatSend.addEventListener('click', sendChat);
+  if (apiKey) {
+    // Use DeepSeek API
+    try {
+      conversationHistory.push({ role: 'user', content: msg });
+      // Keep last 10 messages for context
+      if (conversationHistory.length > 10) conversationHistory = conversationHistory.slice(-10);
+      const systemMsg = { role: 'system', content: '你是 NexusAI 创意助手。用与用户相同的语言回复。帮助用户进行AI绘画、网页生成、品牌设计等创意工作。保持热情、有洞察力。回复控制在200字以内。' };
+      const reply = await callDeepSeekAPI([systemMsg, ...conversationHistory]);
+      conversationHistory.push({ role: 'assistant', content: reply });
+      hideChatTyping();
+      addChatMessage(reply, 'ai');
+    } catch (e) {
+      hideChatTyping();
+      console.error('DeepSeek API error:', e);
+      addChatMessage('API 调用失败: ' + e.message + '。已切回本地模式。', 'ai');
+      // Fallback to keyword
+      addChatMessage(getChatReply(msg), 'ai');
+      apiKey = '';
+      apiKeyInput.value = '';
+      localStorage.removeItem('nexusai_deepseek_key');
+    }
+  } else {
+    // Keyword fallback
+    setTimeout(() => {
+      hideChatTyping();
+      addChatMessage(getChatReply(msg), 'ai');
+    }, 800 + Math.random() * 1200);
+  }
+}chatSend.addEventListener('click', sendChat);
 chatInput.addEventListener('keydown', e => { if (e.key === 'Enter') sendChat(); });
 
 chatFab.addEventListener('click', () => {
