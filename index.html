@@ -513,11 +513,141 @@ body {
 }
 .demo-web-dot { width: 8px; height: 8px; border-radius: 50%; }
 .demo-web-content { padding: 20px; font-size: 0.85rem; color: var(--text-secondary); line-height: 1.7; }
+/* ── Style Selector ── */
+.style-bar { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
+.style-chip {
+  padding: 5px 13px; border-radius: 20px; cursor: pointer;
+  background: var(--glass); border: 1px solid var(--glass-border);
+  color: var(--text-tertiary); font-size: 0.72rem;
+  transition: var(--transition-fast); font-family: inherit;
+  letter-spacing: 0.5px;
+}
+.style-chip:hover { color: var(--text-primary); border-color: var(--glass-border-hover); }
+.style-chip.active { background: rgba(129,140,248,0.2); border-color: var(--accent-1); color: var(--accent-1); font-weight: 600; }
+
+/* ── History Gallery ── */
+.history-bar { display: flex; gap: 8px; margin-top: 12px; overflow-x: auto; padding-bottom: 4px; }
+.history-bar::-webkit-scrollbar { height: 3px; }
+.history-bar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 3px; }
+.history-thumb {
+  width: 70px; height: 50px; border-radius: 8px; flex-shrink: 0; cursor: pointer;
+  border: 1px solid var(--glass-border); overflow: hidden; position: relative;
+  transition: var(--transition-fast);
+}
+.history-thumb:hover { border-color: var(--glass-border-hover); transform: scale(1.05); }
+.history-thumb canvas { width: 100%; height: 100%; display: block; }
+
+/* ── Export Button ── */
+.export-btn {
+  position: absolute; top: 12px; right: 12px; z-index: 6;
+  padding: 6px 13px; border-radius: 20px; cursor: pointer;
+  background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.15);
+  color: #fff; font-size: 0.7rem; font-family: inherit;
+  backdrop-filter: blur(8px); transition: var(--transition-fast);
+  display: none;
+}
+.export-btn:hover { background: rgba(0,0,0,0.7); }
+.export-btn.show { display: block; }
+
+/* ── Chat FAB ── */
+.chat-fab {
+  position: fixed; bottom: 28px; right: 28px; z-index: 150;
+  width: 54px; height: 54px; border-radius: 50%; cursor: pointer;
+  background: var(--gradient-hero); border: none;
+  color: #fff; font-size: 1.3rem;
+  box-shadow: 0 8px 30px rgba(99,102,241,0.4);
+  transition: var(--transition-spring);
+  display: flex; align-items: center; justify-content: center;
+}
+.chat-fab:hover { transform: scale(1.08); box-shadow: 0 12px 40px rgba(99,102,241,0.6); }
+.chat-fab .pulse-ring {
+  position: absolute; inset: -4px; border-radius: 50%;
+  border: 2px solid rgba(129,140,248,0.3);
+  animation: pulse-ring 2s infinite;
+}
+@keyframes pulse-ring {
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.15); opacity: 0; }
+  100% { transform: scale(1); opacity: 0; }
+}
+
+/* ── Chat Panel ── */
+.chat-panel {
+  position: fixed; bottom: 96px; right: 28px; z-index: 150;
+  width: 380px; max-width: calc(100vw - 40px); height: 500px; max-height: 60vh;
+  border-radius: var(--radius-md);
+  background: linear-gradient(160deg, rgba(18,18,35,0.98), rgba(10,10,22,0.99));
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 40px rgba(99,102,241,0.1);
+  display: flex; flex-direction: column; overflow: hidden;
+  transform: translateY(16px) scale(0.95); opacity: 0; pointer-events: none;
+  transition: var(--transition-spring);
+}
+.chat-panel.open { transform: translateY(0) scale(1); opacity: 1; pointer-events: auto; }
+.chat-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 18px; border-bottom: 1px solid var(--glass-border);
+}
+.chat-header-title { font-weight: 600; font-size: 0.9rem; }
+.chat-header-close {
+  width: 28px; height: 28px; border-radius: 50%; cursor: pointer;
+  background: var(--glass); border: 1px solid var(--glass-border);
+  color: var(--text-secondary); display: flex; align-items: center; justify-content: center;
+  font-size: 0.75rem; transition: var(--transition-fast);
+}
+.chat-header-close:hover { background: var(--glass-hover); color: #fff; }
+.chat-messages {
+  flex: 1; overflow-y: auto; padding: 16px;
+  display: flex; flex-direction: column; gap: 12px;
+}
+.chat-msg {
+  max-width: 85%; padding: 10px 14px; border-radius: 14px;
+  font-size: 0.82rem; line-height: 1.55; animation: fadeInUp 0.3s ease-out;
+}
+.chat-msg.user {
+  align-self: flex-end;
+  background: rgba(129,140,248,0.2); border: 1px solid rgba(129,140,248,0.25);
+}
+.chat-msg.ai {
+  align-self: flex-start;
+  background: var(--glass); border: 1px solid var(--glass-border);
+}
+.chat-typing {
+  align-self: flex-start; display: flex; gap: 4px; padding: 10px 14px;
+}
+.chat-typing span {
+  width: 6px; height: 6px; border-radius: 50%; background: var(--text-tertiary);
+  animation: typing-bounce 1.4s infinite both;
+}
+.chat-typing span:nth-child(2) { animation-delay: 0.2s; }
+.chat-typing span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes typing-bounce {
+  0%,80%,100% { transform: translateY(0); }
+  40% { transform: translateY(-8px); }
+}
+.chat-input-wrap {
+  display: flex; gap: 8px; padding: 12px 16px; border-top: 1px solid var(--glass-border);
+}
+.chat-input {
+  flex: 1; padding: 10px 14px; border-radius: 20px;
+  border: 1px solid var(--glass-border); background: var(--glass);
+  color: var(--text-primary); font-size: 0.82rem; outline: none;
+  font-family: inherit;
+}
+.chat-input:focus { border-color: var(--glass-border-hover); }
+.chat-send {
+  width: 36px; height: 36px; border-radius: 50%; cursor: pointer;
+  background: var(--gradient-hero); border: none; color: #fff;
+  font-size: 0.9rem; flex-shrink: 0; transition: var(--transition-fast);
+}
+.chat-send:hover { transform: scale(1.05); }
+
 @media (max-width: 600px) {
   .demo-modal { max-height: 95vh; }
   .demo-prompt-wrap { flex-direction: column; }
   .demo-body { padding: 16px; }
   .demo-tabs { padding: 0 12px; overflow-x: auto; }
+  .chat-panel { right: 8px; width: calc(100vw - 16px); }
 }
 </style>
 </head>
@@ -727,11 +857,41 @@ body {
         <input class="demo-input" id="demoInput" placeholder="描述你想要创作的内容…" />
         <button class="demo-generate" id="demoGenerate">⚡ 生成</button>
       </div>
+      <div class="style-bar" id="styleBar" style="display:none;">
+        <button class="style-chip active" data-style="auto">🎨 自动</button>
+        <button class="style-chip" data-style="realistic">📷 写实</button>
+        <button class="style-chip" data-style="anime">🌸 动漫</button>
+        <button class="style-chip" data-style="oil">🖌️ 油画</button>
+        <button class="style-chip" data-style="watercolor">💧 水彩</button>
+        <button class="style-chip" data-style="pixel">👾 像素</button>
+      </div>
       <div class="demo-suggestions" id="demoSuggestions"></div>
       <div class="demo-result" id="demoResult">
+        <button class="export-btn" id="exportBtn" onclick="exportResult()">📥 导出</button>
         <p style="color:var(--text-tertiary);">👆 输入提示词开始 AI 创作</p>
       </div>
+      <div class="history-bar" id="historyBar"></div>
     </div>
+  </div>
+</div>
+
+<!-- Chat FAB -->
+<button class="chat-fab" id="chatFab" title="AI 助手">
+  <span class="pulse-ring"></span>💬
+</button>
+
+<!-- Chat Panel -->
+<div class="chat-panel" id="chatPanel">
+  <div class="chat-header">
+    <span class="chat-header-title">🤖 NexusAI 助手</span>
+    <button class="chat-header-close" id="chatClose">✕</button>
+  </div>
+  <div class="chat-messages" id="chatMessages">
+    <div class="chat-msg ai">你好！我是 NexusAI 创意助手。可以帮你优化提示词、解答问题、或者聊聊你的创意想法 ✨</div>
+  </div>
+  <div class="chat-input-wrap">
+    <input class="chat-input" id="chatInput" placeholder="输入消息…" />
+    <button class="chat-send" id="chatSend">➤</button>
   </div>
 </div>
 
@@ -975,7 +1135,13 @@ const demoGenerate = document.getElementById('demoGenerate');
 const demoResult = document.getElementById('demoResult');
 const demoSuggestions = document.getElementById('demoSuggestions');
 const demoClose = document.getElementById('demoClose');
+const styleBar = document.getElementById('styleBar');
+const historyBar = document.getElementById('historyBar');
+const exportBtn = document.getElementById('exportBtn');
 let demoMode = 'image';
+let currentStyle = 'auto';
+let history = [];
+let debounceTimer = null;
 
 const suggestions = {
   image: ['赛博朋克城市夜景', '极光下的雪山湖泊', '抽象流体艺术', '日系动漫少女', '3D玻璃材质特写', '古代宫殿水墨风', '星空下的独角兽', '蒸汽波复古风格'],
@@ -988,6 +1154,9 @@ function updateSuggestions() {
   demoSuggestions.innerHTML = list.map(s =>
     `<button class="demo-chip">${s}</button>`
   ).join('');
+  styleBar.style.display = demoMode === 'image' ? 'flex' : 'none';
+  historyBar.innerHTML = '';
+  exportBtn.classList.remove('show');
   demoResult.innerHTML = '<p style="color:var(--text-tertiary);">👆 输入提示词开始 AI 创作</p>';
 }
 
@@ -998,6 +1167,16 @@ document.getElementById('demoTabs').addEventListener('click', e => {
   e.target.classList.add('active');
   demoMode = e.target.dataset.mode;
   updateSuggestions();
+});
+
+// Style chip click
+styleBar.addEventListener('click', e => {
+  if (!e.target.classList.contains('style-chip')) return;
+  document.querySelectorAll('.style-chip').forEach(c => c.classList.remove('active'));
+  e.target.classList.add('active');
+  currentStyle = e.target.dataset.style;
+  // Re-generate with new style if there's a prompt
+  if (demoInput.value.trim()) triggerGeneration();
 });
 
 // Suggestion click
@@ -1013,14 +1192,26 @@ demoInput.addEventListener('keydown', e => {
   if (e.key === 'Enter') triggerGeneration();
 });
 
+// Live preview: debounced auto-generation
+demoInput.addEventListener('input', () => {
+  clearTimeout(debounceTimer);
+  const val = demoInput.value.trim();
+  if (val.length >= 3 && demoMode === 'image') {
+    debounceTimer = setTimeout(triggerGeneration, 1200);
+  }
+});
+
 function triggerGeneration() {
   const prompt = demoInput.value.trim();
   if (!prompt) return;
+  clearTimeout(debounceTimer);
   showLoading();
   setTimeout(() => {
     if (demoMode === 'image') generateImage(prompt);
     else if (demoMode === 'web') generateWeb(prompt);
     else if (demoMode === 'design') generateDesign(prompt);
+    // Save to history
+    saveToHistory();
   }, 2200 + Math.random() * 800);
 }
 
@@ -1031,6 +1222,7 @@ function showLoading() {
       <div class="demo-loading-text" id="loadingText">🤖 AI 正在理解提示词...</div>
     </div>
   `;
+  exportBtn.classList.remove('show');
   const texts = ['🤖 AI 正在理解提示词...', '🧠 神经网络生成中...', '🎨 正在渲染细节...', '✨ 即将完成...'];
   let i = 0;
   const interval = setInterval(() => {
@@ -1041,39 +1233,108 @@ function showLoading() {
   }, 500);
 }
 
+// ── History ──
+function saveToHistory() {
+  const el = demoResult.querySelector('canvas');
+  if (!el) return;
+  const thumb = document.createElement('canvas');
+  thumb.width = 140; thumb.height = 100;
+  const tctx = thumb.getContext('2d');
+  tctx.drawImage(el, 0, 0, 140, 100);
+  history.unshift({ prompt: demoInput.value.trim(), mode: demoMode, style: currentStyle, thumb: thumb.toDataURL() });
+  if (history.length > 6) history.pop();
+  renderHistory();
+}
+
+function renderHistory() {
+  if (demoMode !== 'image') { historyBar.innerHTML = ''; return; }
+  historyBar.innerHTML = history.map((h, i) => `
+    <div class="history-thumb" onclick="loadHistoryItem(${i})" title="${h.prompt}">
+      <img src="${h.thumb}" style="width:100%;height:100%;object-fit:cover;" />
+    </div>
+  `).join('');
+}
+
+function loadHistoryItem(i) {
+  const h = history[i];
+  if (!h) return;
+  demoInput.value = h.prompt;
+  currentStyle = h.style;
+  document.querySelectorAll('.style-chip').forEach(c => {
+    c.classList.toggle('active', c.dataset.style === h.style);
+  });
+  triggerGeneration();
+}
+
+// ── Export ──
+function exportResult() {
+  const canvas = demoResult.querySelector('canvas');
+  if (!canvas) return;
+  const link = document.createElement('a');
+  link.download = 'nexus-ai-' + Date.now() + '.png';
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+  // Toast
+  const toast = document.createElement('div');
+  toast.className = 'toast success';
+  toast.textContent = '📥 图片已导出';
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 2000);
+}
+
 // ── AI Image Generation (Canvas Art) ──
 function generateImage(prompt) {
   const keywords = prompt.toLowerCase();
   let palette, mood;
 
-  if (keywords.includes('赛博') || keywords.includes('cyberpunk') || keywords.includes('霓虹')) {
-    palette = ['#ff00ff','#00ffff','#7b2fff','#ff006e','#0a0a2e'];
-    mood = 'cyber';
-  } else if (keywords.includes('森林') || keywords.includes('自然') || keywords.includes('山') || keywords.includes('湖')) {
-    palette = ['#1a3a2a','#4a8c5c','#8fd19e','#2c5282','#f0e6c8'];
+  // Style override
+  if (currentStyle === 'realistic') {
+    palette = ['#2c3e50','#4a6741','#8b9d83','#d5c4a1','#f5f0e8'];
     mood = 'nature';
-  } else if (keywords.includes('抽象') || keywords.includes('流体') || keywords.includes('艺术')) {
-    palette = ['#ff6b6b','#feca57','#48dbfb','#ff9ff3','#54a0ff'];
-    mood = 'abstract';
-  } else if (keywords.includes('星空') || keywords.includes('宇宙') || keywords.includes('极光')) {
-    palette = ['#0d0221','#3a1c71','#6b2fa0','#00b4d8','#90e0ef'];
-    mood = 'cosmic';
-  } else if (keywords.includes('水墨') || keywords.includes('古代') || keywords.includes('中国风')) {
-    palette = ['#1a1a1a','#3d3d3d','#8b8b8b','#c4a882','#f5e6d3'];
-    mood = 'ink';
-  } else if (keywords.includes('玻璃') || keywords.includes('3d') || keywords.includes('材质')) {
-    palette = ['#e0e7ff','#c7d2fe','#a5b4fc','#818cf8','#6366f1'];
-    mood = 'glass';
-  } else {
-    palette = ['#ff6b9d','#c44569','#6c5ce7','#00cec9','#fdcb6e'];
+  } else if (currentStyle === 'anime') {
+    palette = ['#ff6b9d','#ff9ff3','#feca57','#48dbfb','#f8f0ff'];
     mood = 'vivid';
+  } else if (currentStyle === 'oil') {
+    palette = ['#8b4513','#2c1810','#d4a574','#c87533','#f5deb3'];
+    mood = 'abstract';
+  } else if (currentStyle === 'watercolor') {
+    palette = ['#a8d8ea','#aa96da','#fcbad3','#ffffd2','#e0f0ff'];
+    mood = 'nature';
+  } else if (currentStyle === 'pixel') {
+    palette = ['#1a1c2c','#5d275d','#b13e53','#ef7d57','#ffcd75'];
+    mood = 'cyber';
+  } else {
+    // Auto detect
+    if (keywords.includes('赛博') || keywords.includes('cyberpunk') || keywords.includes('霓虹')) {
+      palette = ['#ff00ff','#00ffff','#7b2fff','#ff006e','#0a0a2e'];
+      mood = 'cyber';
+    } else if (keywords.includes('森林') || keywords.includes('自然') || keywords.includes('山') || keywords.includes('湖')) {
+      palette = ['#1a3a2a','#4a8c5c','#8fd19e','#2c5282','#f0e6c8'];
+      mood = 'nature';
+    } else if (keywords.includes('抽象') || keywords.includes('流体') || keywords.includes('艺术')) {
+      palette = ['#ff6b6b','#feca57','#48dbfb','#ff9ff3','#54a0ff'];
+      mood = 'abstract';
+    } else if (keywords.includes('星空') || keywords.includes('宇宙') || keywords.includes('极光')) {
+      palette = ['#0d0221','#3a1c71','#6b2fa0','#00b4d8','#90e0ef'];
+      mood = 'cosmic';
+    } else if (keywords.includes('水墨') || keywords.includes('古代') || keywords.includes('中国风')) {
+      palette = ['#1a1a1a','#3d3d3d','#8b8b8b','#c4a882','#f5e6d3'];
+      mood = 'ink';
+    } else if (keywords.includes('玻璃') || keywords.includes('3d') || keywords.includes('材质')) {
+      palette = ['#e0e7ff','#c7d2fe','#a5b4fc','#818cf8','#6366f1'];
+      mood = 'glass';
+    } else {
+      palette = ['#ff6b9d','#c44569','#6c5ce7','#00cec9','#fdcb6e'];
+      mood = 'vivid';
+    }
   }
 
-  // Build result HTML with canvas
+  const styleLabel = currentStyle === 'auto' ? 'AI 自适应' : currentStyle;
   demoResult.innerHTML = `
+    <button class="export-btn show" onclick="exportResult()">📥 导出</button>
     <canvas id="genCanvas" style="width:100%;height:400px;display:block;"></canvas>
-    <div style="position:absolute;bottom:12px;left:16px;right:16px;display:flex;justify-content:space-between;align-items:center;">
-      <span style="font-size:0.75rem;color:var(--text-tertiary);">🎨 AI 绘画 · ${prompt.slice(0,20)}…</span>
+    <div style="position:absolute;bottom:12px;left:16px;right:16px;display:flex;justify-content:space-between;align-items:center;pointer-events:none;">
+      <span style="font-size:0.75rem;color:var(--text-tertiary);">🎨 AI 绘画 · ${styleLabel} · ${prompt.slice(0,20)}…</span>
       <span style="font-size:0.7rem;color:var(--accent-1);">4K · 5120×2880</span>
     </div>
   `;
@@ -1095,14 +1356,11 @@ function generateImage(prompt) {
   bg.addColorStop(1, palette[4] || palette[1]);
   ctx.fillStyle = bg; ctx.fillRect(0,0,W,H);
 
-  // Generate visual elements based on mood
+  // Draw based on mood
   if (mood === 'cyber') {
-    // Neon grid
-    ctx.strokeStyle = 'rgba(0,255,255,0.15)';
-    ctx.lineWidth = 1;
+    ctx.strokeStyle = 'rgba(0,255,255,0.15)'; ctx.lineWidth = 1;
     for (let y=0; y<H; y+=30) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
     for (let x=0; x<W; x+=30) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
-    // Glowing orbs
     for (let i=0; i<5; i++) {
       const gx = W*(0.15+i*0.18), gy = H*(0.2 + Math.sin(i*1.5)*0.4);
       const grad = ctx.createRadialGradient(gx,gy,0,gx,gy,80);
@@ -1111,7 +1369,6 @@ function generateImage(prompt) {
       grad.addColorStop(1, 'transparent');
       ctx.fillStyle = grad; ctx.beginPath(); ctx.arc(gx,gy,80,0,Math.PI*2); ctx.fill();
     }
-    // Vertical neon lines
     for (let i=0; i<8; i++) {
       const lx = W*(0.1+i*0.12), lh = 80+Math.sin(i)*50;
       ctx.strokeStyle = `rgba(${i%2?255:0},${i%2?0:255},255,${0.1+i*0.08})`;
@@ -1119,25 +1376,21 @@ function generateImage(prompt) {
       ctx.moveTo(lx, H); ctx.lineTo(lx, H-lh); ctx.stroke();
     }
   } else if (mood === 'nature') {
-    // Mountains
     for (let m=0; m<3; m++) {
       ctx.beginPath(); ctx.moveTo(0,H);
       const mx = W*(0.3+m*0.25), mh = H*(0.4+m*0.2);
       ctx.quadraticCurveTo(mx, H-mh, mx+200, H);
       ctx.fillStyle = `rgba(${20+m*30},${60+m*40},${30+m*30},0.6)`; ctx.fill();
     }
-    // Floating particles (fireflies)
     for (let i=0; i<40; i++) {
       const px = Math.random()*W, py = Math.random()*H*0.7;
       ctx.beginPath(); ctx.arc(px,py,1.5,0,Math.PI*2);
       ctx.fillStyle = `rgba(200,230,150,${0.3+Math.random()*0.5})`; ctx.fill();
-      // Glow
       const fg = ctx.createRadialGradient(px,py,0,px,py,8);
       fg.addColorStop(0,'rgba(200,230,150,0.6)'); fg.addColorStop(1,'transparent');
       ctx.fillStyle = fg; ctx.beginPath(); ctx.arc(px,py,8,0,Math.PI*2); ctx.fill();
     }
   } else if (mood === 'abstract') {
-    // Flow fields
     for (let i=0; i<12; i++) {
       ctx.beginPath();
       const sx = W*(0.05+Math.random()*0.9), sy = H*(0.1+Math.random()*0.8);
@@ -1150,21 +1403,18 @@ function generateImage(prompt) {
       ctx.strokeStyle = `rgba(${255*Math.random()},${255*Math.random()},255,0.3)`;
       ctx.lineWidth = 2+Math.random()*4; ctx.stroke();
     }
-    // Blur circles
     for (let i=0; i<6; i++) {
       const cx = W*(0.1+Math.random()*0.8), cy = H*(0.2+Math.random()*0.6);
       const rg = ctx.createRadialGradient(cx,cy,0,cx,cy,100);
-      rg.addColorStop(0, `rgba(${[palette[3]]},0.25)`); rg.addColorStop(1,'transparent');
+      rg.addColorStop(0, palette[3]+',0.25)'); rg.addColorStop(1,'transparent');
       ctx.fillStyle = rg; ctx.beginPath(); ctx.arc(cx,cy,100,0,Math.PI*2); ctx.fill();
     }
   } else if (mood === 'cosmic') {
-    // Stars
     for (let i=0; i<200; i++) {
       const sx = Math.random()*W, sy = Math.random()*H*0.7;
       ctx.beginPath(); ctx.arc(sx,sy,Math.random()*1.5,0,Math.PI*2);
       ctx.fillStyle = `rgba(255,255,255,${0.3+Math.random()*0.7})`; ctx.fill();
     }
-    // Nebula clouds
     for (let i=0; i<4; i++) {
       const nx = W*(0.15+i*0.22), ny = H*(0.2+Math.sin(i*1.7)*0.3);
       const ng = ctx.createRadialGradient(nx,ny,0,nx,ny,150);
@@ -1172,7 +1422,6 @@ function generateImage(prompt) {
       ng.addColorStop(0, colors[i]); ng.addColorStop(1,'transparent');
       ctx.fillStyle = ng; ctx.beginPath(); ctx.arc(nx,ny,150,0,Math.PI*2); ctx.fill();
     }
-    // Aurora wave
     ctx.beginPath();
     for (let x=0; x<W; x+=2) {
       const y = H*0.15 + Math.sin(x*0.008)*30 + Math.sin(x*0.015)*20;
@@ -1180,23 +1429,33 @@ function generateImage(prompt) {
     }
     ctx.strokeStyle = 'rgba(0,255,200,0.6)'; ctx.lineWidth = 8; ctx.stroke();
     ctx.strokeStyle = 'rgba(100,200,255,0.4)'; ctx.lineWidth = 15; ctx.stroke();
+  } else if (currentStyle === 'pixel') {
+    const pxSize = 8;
+    for (let sx=0; sx<W; sx+=pxSize) {
+      for (let sy=0; sy<H; sy+=pxSize) {
+        const c = palette[Math.floor(Math.random()*palette.length)];
+        ctx.fillStyle = c; ctx.fillRect(sx, sy, pxSize, pxSize);
+      }
+    }
+    for (let i=0; i<10; i++) {
+      const px = Math.floor(Math.random()*(W/pxSize))*pxSize;
+      const py = Math.floor(Math.random()*(H/pxSize))*pxSize;
+      ctx.fillStyle = '#fff';
+      ctx.fillRect(px, py, pxSize*2, pxSize*2);
+    }
   } else {
-    // Vivid / glass / ink - flowing orbs
     for (let i=0; i<10; i++) {
       const ox = W*(0.1+Math.random()*0.8), oy = H*(0.1+Math.random()*0.8);
       const og = ctx.createRadialGradient(ox,oy,0,ox,oy,60+Math.random()*60);
-      og.addColorStop(0, palette[i%palette.length].replace(')','').replace('rgb(','rgba(')+',0.4)');
-      og.addColorStop(1,'transparent');
+      og.addColorStop(0, palette[i%palette.length]+',0.4)'); og.addColorStop(1,'transparent');
       ctx.fillStyle = og; ctx.beginPath(); ctx.arc(ox,oy,80,0,Math.PI*2); ctx.fill();
     }
-    // Fine particles
     for (let i=0; i<60; i++) {
       ctx.beginPath(); ctx.arc(Math.random()*W,Math.random()*H,1,0,Math.PI*2);
       ctx.fillStyle = `rgba(255,255,255,${0.2+Math.random()*0.4})`; ctx.fill();
     }
   }
 
-  // Watermark
   ctx.fillStyle = 'rgba(255,255,255,0.15)'; ctx.font = '12px Inter,sans-serif';
   ctx.fillText('Generated by NexusAI', 16, H-16);
 }
@@ -1212,13 +1471,13 @@ function generateWeb(prompt) {
   const text = isDark ? '#e2e8f0' : '#1e293b';
   const accent = isDark ? '#818cf8' : '#6366f1';
   const border = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)';
-
-  // Generate dynamic content from prompt
   const heroTitle = prompt.length > 15 ? prompt : (prompt + ' · AI驱动');
   const features = ['智能引擎', '极速渲染', '云端协作', '数据洞察'].slice(0,3+Math.floor(Math.random()*2));
 
+  historyBar.innerHTML = '';
+  exportBtn.classList.remove('show');
   demoResult.innerHTML = `
-    <div class="demo-web-frame" style="background:${bg};color:${text};" id="webFrame">
+    <div class="demo-web-frame" style="background:${bg};color:${text};">
       <div class="demo-web-header" style="border-color:${border};">
         <div class="demo-web-dot" style="background:#ff5f57;"></div>
         <div class="demo-web-dot" style="background:#febc2e;"></div>
@@ -1227,33 +1486,33 @@ function generateWeb(prompt) {
       </div>
       <div class="demo-web-content">
         <nav style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
-          <span style="font-weight:700;font-size:1rem;color:${accent};">● ${prompt.slice(0,8)}</span>
+          <span style="font-weight:700;font-size:1rem;color:${accent};">O ${prompt.slice(0,8)}</span>
           <div style="display:flex;gap:12px;font-size:0.7rem;color:#888;">
-            <span>首页</span><span>产品</span><span>关于</span><span>联系</span>
+            <span>Home</span><span>Products</span><span>About</span><span>Contact</span>
           </div>
         </nav>
         <div style="text-align:center;padding:30px 0;">
           <h1 style="font-size:1.6rem;font-weight:700;margin-bottom:8px;">${heroTitle}</h1>
-          <p style="color:#888;font-size:0.8rem;">AI 驱动的智能创作平台，让创意无限延伸</p>
+          <p style="color:#888;font-size:0.8rem;">AI-Powered creation platform</p>
           <div style="margin-top:16px;display:flex;gap:8px;justify-content:center;">
-            <span style="padding:8px 20px;background:${accent};color:#fff;border-radius:50px;font-size:0.75rem;font-weight:600;">立即体验</span>
-            <span style="padding:8px 20px;border:1px solid ${border};border-radius:50px;font-size:0.75rem;">了解更多</span>
+            <span style="padding:8px 20px;background:${accent};color:#fff;border-radius:50px;font-size:0.75rem;font-weight:600;">Get Started</span>
+            <span style="padding:8px 20px;border:1px solid ${border};border-radius:50px;font-size:0.75rem;">Learn More</span>
           </div>
         </div>
         <div style="display:grid;grid-template-columns:repeat(${Math.min(features.length,3)},1fr);gap:8px;margin-top:16px;">
           ${features.map(f => `
             <div style="padding:16px;background:${cardBg};border:1px solid ${border};border-radius:12px;text-align:center;">
-              <div style="font-size:1.2rem;margin-bottom:4px;">✨</div>
+              <div style="font-size:1.2rem;margin-bottom:4px;">✦</div>
               <div style="font-weight:600;font-size:0.8rem;">${f}</div>
-              <div style="color:#888;font-size:0.65rem;margin-top:2px;">AI 自动优化</div>
+              <div style="color:#888;font-size:0.65rem;">AI-Optimized</div>
             </div>
           `).join('')}
         </div>
       </div>
     </div>
     <div style="position:absolute;bottom:12px;left:16px;right:16px;display:flex;justify-content:space-between;align-items:center;pointer-events:none;">
-      <span style="font-size:0.75rem;color:var(--text-tertiary);">🖥️ AI 网页生成 · React + Tailwind</span>
-      <span style="font-size:0.7rem;color:#28c840;">● 可部署</span>
+      <span style="font-size:0.75rem;color:var(--text-tertiary);">Webpage Generated · React + Tailwind</span>
+      <span style="font-size:0.7rem;color:#28c840;">Deployable</span>
     </div>
   `;
 }
@@ -1262,11 +1521,11 @@ function generateWeb(prompt) {
 function generateDesign(prompt) {
   const kw = prompt.toLowerCase();
   let designPalette;
-  if (kw.includes('科技')||kw.includes('logo')||kw.includes('品牌')) {
+  if (kw.includes('tech')||kw.includes('logo')||kw.includes('brand')) {
     designPalette = ['#6366f1','#818cf8','#22d3ee','#f0f0f5','#0a0a1a'];
-  } else if (kw.includes('咖啡')||kw.includes('温暖')) {
+  } else if (kw.includes('coffee')||kw.includes('warm')) {
     designPalette = ['#6f4e37','#d4a574','#f5e6d3','#2c1810','#fff8f0'];
-  } else if (kw.includes('健身')||kw.includes('运动')) {
+  } else if (kw.includes('fitness')||kw.includes('sport')) {
     designPalette = ['#ff4757','#ff6b81','#2ed573','#ffffff','#1e1e2e'];
   } else {
     designPalette = ['#a78bfa','#f472b6','#34d399','#fbbf24','#1a1a2e'];
@@ -1280,47 +1539,45 @@ function generateDesign(prompt) {
   else if (shape === 'hexagon') logoShape = 'border-radius:8px;clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%);';
   else logoShape = 'border-radius:4px;';
 
+  historyBar.innerHTML = '';
+  exportBtn.classList.remove('show');
   demoResult.innerHTML = `
     <div class="demo-result-preview">
-      <!-- Logo -->
       <div style="display:flex;align-items:center;gap:16px;margin-bottom:24px;width:100%;">
         <div style="width:72px;height:72px;${logoShape}background:linear-gradient(135deg,${designPalette[0]},${designPalette[1]});display:flex;align-items:center;justify-content:center;font-size:1.8rem;">✦</div>
         <div>
           <div style="font-weight:700;font-size:1.2rem;">${prompt.slice(0,12)}</div>
-          <div style="color:var(--text-tertiary);font-size:0.75rem;">品牌标识 · AI 生成</div>
+          <div style="color:var(--text-tertiary);font-size:0.75rem;">Brand Identity · AI Generated</div>
         </div>
       </div>
-      <!-- Color palette -->
       <div style="width:100%;">
-        <div style="font-size:0.7rem;color:var(--text-tertiary);margin-bottom:8px;">🎨 配色方案</div>
+        <div style="font-size:0.7rem;color:var(--text-tertiary);margin-bottom:8px;">Palette</div>
         <div style="display:flex;gap:6px;margin-bottom:20px;">
           ${designPalette.map(c => `
             <div style="width:40px;height:40px;border-radius:10px;background:${c};border:1px solid rgba(255,255,255,0.1);flex:1;" title="${c}"></div>
           `).join('')}
         </div>
       </div>
-      <!-- Typography -->
       <div style="width:100%;margin-bottom:16px;">
-        <div style="font-size:0.7rem;color:var(--text-tertiary);margin-bottom:8px;">🔤 字体方案</div>
+        <div style="font-size:0.7rem;color:var(--text-tertiary);margin-bottom:8px;">Typography</div>
         <div style="font-size:1.6rem;font-weight:700;margin-bottom:4px;">Heading Display</div>
-        <div style="font-size:1rem;color:var(--text-secondary);margin-bottom:8px;">Body Text · 正文内容展示</div>
-        <div style="font-size:0.7rem;color:var(--text-tertiary);">CAPTION · 辅助文字</div>
+        <div style="font-size:1rem;color:var(--text-secondary);margin-bottom:8px;">Body text sample content</div>
+        <div style="font-size:0.7rem;color:var(--text-tertiary);">CAPTION · AUXILIARY TEXT</div>
       </div>
-      <!-- Preview mockup -->
       <div style="width:100%;padding:20px;background:${designPalette[4]};border-radius:16px;border:1px solid rgba(255,255,255,0.06);">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
           <div style="width:32px;height:32px;${logoShape}background:linear-gradient(135deg,${designPalette[0]},${designPalette[1]});display:flex;align-items:center;justify-content:center;font-size:0.7rem;transform:scale(0.6);">✦</div>
           <div style="font-weight:600;font-size:0.8rem;color:${designPalette[3]};">${prompt.slice(0,10)}</div>
         </div>
         <div style="display:flex;gap:6px;">
-          <div style="flex:1;padding:12px;background:${designPalette[0]};border-radius:10px;text-align:center;color:#fff;font-size:0.7rem;font-weight:600;">主按钮</div>
-          <div style="flex:1;padding:12px;background:transparent;border:1px solid ${designPalette[2]};border-radius:10px;text-align:center;color:${designPalette[2]};font-size:0.7rem;">次按钮</div>
+          <div style="flex:1;padding:12px;background:${designPalette[0]};border-radius:10px;text-align:center;color:#fff;font-size:0.7rem;font-weight:600;">Primary</div>
+          <div style="flex:1;padding:12px;background:transparent;border:1px solid ${designPalette[2]};border-radius:10px;text-align:center;color:${designPalette[2]};font-size:0.7rem;">Secondary</div>
         </div>
       </div>
     </div>
     <div style="position:absolute;bottom:12px;left:16px;right:16px;display:flex;justify-content:space-between;align-items:center;pointer-events:none;">
-      <span style="font-size:0.75rem;color:var(--text-tertiary);">✨ AI 设计 · 品牌系统</span>
-      <span style="font-size:0.7rem;color:var(--accent-3);">源文件可导出</span>
+      <span style="font-size:0.75rem;color:var(--text-tertiary);">AI Design · Brand System</span>
+      <span style="font-size:0.7rem;color:var(--accent-3);">Exportable</span>
     </div>
   `;
 }
@@ -1328,12 +1585,19 @@ function generateDesign(prompt) {
 // ── Modal Controls ──
 function openDemo(mode = 'image') {
   demoMode = mode;
+  currentStyle = 'auto';
   document.querySelectorAll('.demo-tab').forEach(t => {
     t.classList.toggle('active', t.dataset.mode === mode);
   });
+  document.querySelectorAll('.style-chip').forEach(c => {
+    c.classList.toggle('active', c.dataset.style === 'auto');
+  });
   updateSuggestions();
   demoInput.value = '';
-  demoResult.innerHTML = '<p style="color:var(--text-tertiary);">👆 输入提示词开始 AI 创作</p>';
+  history = [];
+  historyBar.innerHTML = '';
+  exportBtn.classList.remove('show');
+  demoResult.innerHTML = '<p style="color:var(--text-tertiary);">👆 Input a prompt to start AI creation</p>';
   demoOverlay.classList.add('open');
   document.body.style.overflow = 'hidden';
   setTimeout(() => demoInput.focus(), 300);
@@ -1355,6 +1619,88 @@ document.addEventListener('keydown', e => {
 // Hook up CTA buttons
 document.getElementById('btnTry').addEventListener('click', e => { e.preventDefault(); openDemo('image'); });
 document.getElementById('btnDemo').addEventListener('click', e => { e.preventDefault(); openDemo('web'); });
+
+// ═══════════════════════════════════════════
+//  AI Chat Assistant
+// ═══════════════════════════════════════════
+const chatFab = document.getElementById('chatFab');
+const chatPanel = document.getElementById('chatPanel');
+const chatClose = document.getElementById('chatClose');
+const chatInput = document.getElementById('chatInput');
+const chatSend = document.getElementById('chatSend');
+const chatMessages = document.getElementById('chatMessages');
+
+const chatReplies = [
+  { kw: ['hello','hi','你好','嗨','在吗'], reply: 'Hello! I am NexusAI assistant. I can help with creative ideas, prompt optimization, or any questions about AI creation. Feel free to ask!' },
+  { kw: ['画','image','picture','generate','生成','创作','图'], reply: 'For AI painting, try describing your vision in detail — including subject, style, lighting, and mood. The more specific, the better the result. Try "Generate" in the demo panel!' },
+  { kw: ['web','网页','site','网站','页面'], reply: 'Our AI can generate full landing pages! Describe your site in the demo panel, and it will create a complete preview with navigation, hero section, and feature cards.' },
+  { kw: ['design','设计','logo','brand','品牌'], reply: 'AI Design mode generates complete brand systems — logos, color palettes, typography, and UI component previews. All in one click.' },
+  { kw: ['prompt','提示词','提示','优化'], reply: 'A good prompt = subject + style + details + mood. Example: "A futuristic city at sunset, cyberpunk style, neon lights reflecting off glass buildings, cinematic lighting, 8K." Try it!' },
+  { kw: ['thanks','谢谢','感谢','thx','棒'], reply: 'Happy to help! Keep creating with NexusAI!' },
+  { kw: ['price','价格','收费','free','免费'], reply: 'NexusAI is currently in free beta. All features — AI painting, web generation, and design — are available at no cost.' },
+];
+
+function getChatReply(msg) {
+  const lower = msg.toLowerCase();
+  for (let r of chatReplies) {
+    if (r.kw.some(k => lower.includes(k))) return r.reply;
+  }
+  const fallbacks = [
+    'Interesting! Tell me more about what kind of creation you have in mind.',
+    'I recommend trying the AI painting demo with a detailed prompt — you might be surprised by the results!',
+    'That sounds creative! Have you tried our live preview feature? It auto-generates as you type.',
+    'Good question! Our AI engine supports multiple styles — realistic, anime, oil painting, watercolor, and pixel art.',
+  ];
+  return fallbacks[Math.floor(Math.random() * fallbacks.length)];
+}
+
+function addChatMessage(text, role) {
+  const div = document.createElement('div');
+  div.className = `chat-msg ${role}`;
+  div.textContent = text;
+  chatMessages.appendChild(div);
+  chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+function showChatTyping() {
+  const div = document.createElement('div');
+  div.className = 'chat-typing';
+  div.id = 'chatTyping';
+  div.innerHTML = '<span></span><span></span><span></span>';
+  chatMessages.appendChild(div);
+  chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+function hideChatTyping() {
+  const el = document.getElementById('chatTyping');
+  if (el) el.remove();
+}
+
+function sendChat() {
+  const msg = chatInput.value.trim();
+  if (!msg) return;
+  addChatMessage(msg, 'user');
+  chatInput.value = '';
+  showChatTyping();
+  setTimeout(() => {
+    hideChatTyping();
+    addChatMessage(getChatReply(msg), 'ai');
+  }, 800 + Math.random() * 1200);
+}
+
+chatSend.addEventListener('click', sendChat);
+chatInput.addEventListener('keydown', e => { if (e.key === 'Enter') sendChat(); });
+
+chatFab.addEventListener('click', () => {
+  const open = chatPanel.classList.toggle('open');
+  chatFab.style.opacity = open ? '0' : '1';
+  if (open) setTimeout(() => chatInput.focus(), 300);
+});
+
+chatClose.addEventListener('click', () => {
+  chatPanel.classList.remove('open');
+  chatFab.style.opacity = '1';
+});
 </script>
 </body>
 </html>
