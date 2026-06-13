@@ -1,1334 +1,1359 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>💖 致我喜欢的你</title>
-    <style>
-        :root {
-            --pink: #ff7eb3;
-            --pink-dark: #ff4080;
-            --pink-light: #ffb6d3;
-            --purple: #c44dff;
-            --white-soft: rgba(255,255,255,0.9);
-        }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-
-        body {
-            min-height: 100vh;
-            font-family: 'PingFang SC', 'Microsoft YaHei', 'Hiragino Sans GB', sans-serif;
-            overflow-x: hidden;
-            cursor: default;
-            user-select: none;
-        }
-
-        /* ========== BACKGROUND LAYERS ========== */
-        .bg-layer {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            z-index: -3;
-        }
-
-        /* Anime background image — 替换为你的图片URL */
-        .bg-image {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            z-index: -3;
-            background:
-                url('https://picsum.photos/1920/1080') center/cover no-repeat;
-            /* ↑↑↑ 把上面的URL替换成你的动漫JK/DK相拥照片 ↑↑↑ */
-            /* 例如本地文件: url('your-photo.jpg') */
-            filter: brightness(0.45) saturate(1.3);
-            transform: scale(1.05);
-            animation: bgSlowZoom 30s ease-in-out infinite alternate;
-        }
-
-        @keyframes bgSlowZoom {
-            0% { transform: scale(1); }
-            100% { transform: scale(1.1); }
-        }
-
-        /* Gradient overlay on top of image */
-        .bg-gradient-overlay {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            z-index: -2;
-            background: linear-gradient(
-                160deg,
-                rgba(255, 150, 180, 0.25) 0%,
-                rgba(180, 100, 220, 0.2) 30%,
-                rgba(30, 10, 60, 0.5) 60%,
-                rgba(20, 5, 40, 0.6) 100%
-            );
-            pointer-events: none;
-        }
-
-        /* Vignette */
-        .bg-vignette {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            z-index: -1;
-            pointer-events: none;
-            box-shadow: inset 0 0 200px rgba(20, 0, 40, 0.7);
-        }
-
-        /* ========== SAKURA PETALS (CSS-only falling cherry blossoms) ========== */
-        .sakura-container {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            pointer-events: none;
-            z-index: 0;
-            overflow: hidden;
-        }
-
-        .sakura-petal {
-            position: absolute;
-            top: -60px;
-            animation: sakuraFall var(--fall-dur) linear infinite;
-            animation-delay: var(--fall-delay);
-            opacity: 0.75;
-        }
-
-        @keyframes sakuraFall {
-            0% {
-                transform: translateY(-60px) translateX(0) rotate(0deg);
-                opacity: 0.9;
-            }
-            25% {
-                transform: translateY(25vh) translateX(var(--drift1)) rotate(90deg);
-            }
-            50% {
-                transform: translateY(50vh) translateX(var(--drift2)) rotate(200deg);
-                opacity: 0.7;
-            }
-            75% {
-                transform: translateY(75vh) translateX(var(--drift3)) rotate(310deg);
-            }
-            100% {
-                transform: translateY(105vh) translateX(var(--drift4)) rotate(400deg);
-                opacity: 0.3;
-            }
-        }
-
-        /* ========== MOUSE TRAIL SPARKLE ========== */
-        .sparkle-trail {
-            position: fixed;
-            pointer-events: none;
-            z-index: 999;
-            font-size: 18px;
-            animation: sparkleFade 1s ease-out forwards;
-        }
-
-        @keyframes sparkleFade {
-            0% { opacity: 1; transform: translate(0,0) scale(1.2); }
-            100% { opacity: 0; transform: translate(var(--sx), var(--sy)) scale(0); }
-        }
-
-        /* ========== PAGE SYSTEM ========== */
-        .pages-wrapper {
-            position: relative;
-            z-index: 10;
-            width: 100%;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-
-        .page {
-            display: none;
-            width: 100%;
-            max-width: 650px;
-            animation: pageIn 0.7s cubic-bezier(0.22, 0.61, 0.36, 1);
-        }
-
-        .page.active {
-            display: block;
-        }
-
-        @keyframes pageIn {
-            0% { opacity: 0; transform: translateY(30px) scale(0.95); }
-            100% { opacity: 1; transform: translateY(0) scale(1); }
-        }
-
-        /* ========== MAIN CARD ========== */
-        .card {
-            background: rgba(255, 255, 255, 0.07);
-            backdrop-filter: blur(25px);
-            -webkit-backdrop-filter: blur(25px);
-            border: 1px solid rgba(255, 255, 255, 0.18);
-            border-radius: 30px;
-            padding: 45px 50px;
-            text-align: center;
-            box-shadow:
-                0 20px 60px rgba(0, 0, 0, 0.3),
-                0 0 80px rgba(255, 100, 150, 0.12),
-                inset 0 1px 0 rgba(255,255,255,0.08);
-            transition: all 0.4s ease;
-            animation: cardFloat 5s ease-in-out infinite;
-        }
-
-        @keyframes cardFloat {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-8px); }
-        }
-
-        /* ========== HEART ICON ========== */
-        .heart-icon {
-            font-size: 75px;
-            display: inline-block;
-            animation: heartBeat 1.1s ease-in-out infinite;
-            filter: drop-shadow(0 0 25px rgba(255, 100, 150, 0.7));
-            margin-bottom: 15px;
-            cursor: pointer;
-        }
-
-        @keyframes heartBeat {
-            0%, 100% { transform: scale(1); }
-            12% { transform: scale(1.3); }
-            24% { transform: scale(1); }
-            36% { transform: scale(1.18); }
-            48% { transform: scale(1); }
-        }
-
-        /* ========== TITLE ========== */
-        .title {
-            font-size: 2.6em;
-            font-weight: 800;
-            background: linear-gradient(135deg, #ff9ec4, #ff6090, #ff4080, #ff9ec4);
-            background-size: 300% 300%;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            animation: gradientShift 3s ease-in-out infinite;
-            margin-bottom: 6px;
-            letter-spacing: 5px;
-            text-shadow: none;
-        }
-
-        @keyframes gradientShift {
-            0%, 100% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-        }
-
-        .subtitle {
-            font-size: 1em;
-            color: rgba(255, 255, 255, 0.45);
-            letter-spacing: 4px;
-            font-weight: 300;
-            margin-bottom: 24px;
-        }
-
-        /* ========== DIVIDER ========== */
-        .divider {
-            width: 100px;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, rgba(255,130,170,0.7), transparent);
-            margin: 0 auto 24px;
-            border-radius: 1px;
-        }
-
-        .divider-dot {
-            width: 6px;
-            height: 6px;
-            background: #ff6090;
-            border-radius: 50%;
-            margin: -2px auto;
-            box-shadow: 0 0 12px rgba(255,100,150,0.8);
-        }
-
-        /* ========== MESSAGE ========== */
-        .message {
-            color: rgba(255, 255, 255, 0.88);
-            font-size: 1.1em;
-            line-height: 2.1;
-            letter-spacing: 2px;
-            margin-bottom: 24px;
-            font-weight: 300;
-        }
-
-        .message .highlight {
-            color: #ff8db5;
-            font-weight: 700;
-            text-shadow: 0 0 15px rgba(255, 130, 170, 0.5);
-        }
-
-        /* ========== TYPING ========== */
-        .typing-line {
-            color: rgba(255, 255, 255, 0.9);
-            font-size: 1.25em;
-            margin: 18px 0;
-            min-height: 2em;
-            letter-spacing: 2px;
-        }
-
-        .cursor {
-            display: inline-block;
-            width: 2px;
-            height: 1.2em;
-            background: #ff8db5;
-            margin-left: 3px;
-            vertical-align: text-bottom;
-            animation: blink 0.7s step-end infinite;
-            box-shadow: 0 0 8px #ff8db5;
-        }
-
-        @keyframes blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0; }
-        }
-
-        /* ========== BUTTONS ========== */
-        .buttons {
-            display: flex;
-            gap: 18px;
-            justify-content: center;
-            flex-wrap: wrap;
-            margin-top: 28px;
-        }
-
-        .btn {
-            padding: 14px 42px;
-            border-radius: 50px;
-            border: none;
-            font-size: 1.05em;
-            cursor: pointer;
-            letter-spacing: 3px;
-            font-weight: 600;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            position: relative;
-            overflow: hidden;
-            font-family: inherit;
-            outline: none;
-        }
-
-        .btn-yes {
-            background: linear-gradient(135deg, #ff6090, #e91e63);
-            color: white;
-            box-shadow: 0 8px 30px rgba(255, 64, 128, 0.45);
-        }
-
-        .btn-yes:hover {
-            transform: translateY(-4px) scale(1.06);
-            box-shadow: 0 16px 45px rgba(255, 64, 128, 0.65);
-        }
-
-        .btn-yes:active {
-            transform: translateY(0) scale(0.97);
-        }
-
-        .btn-yes::after {
-            content: '';
-            position: absolute;
-            top: -50%; left: -50%;
-            width: 200%; height: 200%;
-            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.25), transparent);
-            transform: translateX(-100%);
-            transition: transform 0.7s;
-        }
-
-        .btn-yes:hover::after {
-            transform: translateX(100%);
-        }
-
-        .btn-maybe {
-            background: rgba(255, 255, 255, 0.08);
-            color: rgba(255, 255, 255, 0.85);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(10px);
-        }
-
-        .btn-maybe:hover {
-            background: rgba(255, 255, 255, 0.18);
-            transform: translateY(-4px);
-        }
-
-        .btn-next {
-            background: linear-gradient(135deg, rgba(255,255,255,0.12), rgba(255,255,255,0.05));
-            color: rgba(255,255,255,0.8);
-            border: 1px solid rgba(255,255,255,0.2);
-            margin-top: 20px;
-            padding: 12px 36px;
-            font-size: 0.95em;
-        }
-
-        .btn-next:hover {
-            background: rgba(255,255,255,0.2);
-            transform: translateY(-3px);
-        }
-
-        /* ========== LOVE METER (Page 2) ========== */
-        .meter-section {
-            margin: 20px 0;
-        }
-
-        .meter-label {
-            color: rgba(255,255,255,0.7);
-            font-size: 0.9em;
-            letter-spacing: 3px;
-            margin-bottom: 10px;
-        }
-
-        .meter-bar-outer {
-            width: 100%;
-            height: 12px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
-        }
-
-        .meter-bar-inner {
-            height: 100%;
-            background: linear-gradient(90deg, #ff9ec4, #ff6090, #e91e63);
-            border-radius: 10px;
-            width: 0%;
-            transition: width 2s cubic-bezier(0.22, 0.61, 0.36, 1);
-            box-shadow: 0 0 15px rgba(255,100,150,0.6);
-            position: relative;
-        }
-
-        .meter-bar-inner::after {
-            content: '';
-            position: absolute;
-            right: 0; top: 0;
-            width: 20px; height: 100%;
-            background: white;
-            border-radius: 50%;
-            box-shadow: 0 0 20px white;
-        }
-
-        .meter-value {
-            color: #ff8db5;
-            font-size: 2em;
-            font-weight: 800;
-            margin-top: 8px;
-            letter-spacing: 2px;
-        }
-
-        /* ========== REASONS LIST ========== */
-        .reasons-list {
-            text-align: left;
-            color: rgba(255,255,255,0.8);
-            font-size: 1em;
-            line-height: 2.2;
-            letter-spacing: 1.5px;
-        }
-
-        .reasons-list li {
-            list-style: none;
-            padding: 6px 0;
-            padding-left: 24px;
-            position: relative;
-            animation: reasonSlide 0.5s ease-out forwards;
-            opacity: 0;
-        }
-
-        .reasons-list li::before {
-            content: '🌸';
-            position: absolute;
-            left: 0;
-            font-size: 0.9em;
-        }
-
-        @keyframes reasonSlide {
-            0% { opacity: 0; transform: translateX(-20px); }
-            100% { opacity: 1; transform: translateX(0); }
-        }
-
-        /* ========== PROMISE BOX ========== */
-        .promise-box {
-            background: rgba(255,255,255,0.06);
-            border: 1px solid rgba(255,255,255,0.12);
-            border-radius: 20px;
-            padding: 25px 30px;
-            margin: 20px 0;
-            text-align: left;
-            color: rgba(255,255,255,0.8);
-            line-height: 2;
-            letter-spacing: 1.5px;
-            font-size: 0.95em;
-        }
-
-        .promise-box .check-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 5px 0;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .promise-box .check-item:hover {
-            color: #ff8db5;
-        }
-
-        .check-box {
-            width: 22px;
-            height: 22px;
-            border: 2px solid rgba(255,255,255,0.3);
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
-            transition: all 0.3s;
-            flex-shrink: 0;
-        }
-
-        .check-box.checked {
-            background: #ff6090;
-            border-color: #ff6090;
-            box-shadow: 0 0 12px rgba(255,100,150,0.5);
-        }
-
-        /* ========== FLOATING PHOTO FRAME ========== */
-        .photo-frame {
-            display: inline-block;
-            border: 3px solid rgba(255,255,255,0.2);
-            border-radius: 16px;
-            overflow: hidden;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
-            animation: photoFloat 4s ease-in-out infinite;
-            max-width: 180px;
-            margin: 15px;
-        }
-
-        .photo-frame img {
-            display: block;
-            width: 100%;
-        }
-
-        @keyframes photoFloat {
-            0%, 100% { transform: translateY(0) rotate(-1deg); }
-            50% { transform: translateY(-8px) rotate(1deg); }
-        }
-
-        /* ========== COUNTDOWN ========== */
-        .countdown-digits {
-            display: flex;
-            gap: 12px;
-            justify-content: center;
-            margin: 15px 0;
-            flex-wrap: wrap;
-        }
-
-        .countdown-item {
-            background: rgba(255,255,255,0.08);
-            border: 1px solid rgba(255,255,255,0.12);
-            border-radius: 14px;
-            padding: 14px 18px;
-            text-align: center;
-            min-width: 70px;
-        }
-
-        .countdown-num {
-            color: #ff8db5;
-            font-size: 2em;
-            font-weight: 800;
-            text-shadow: 0 0 15px rgba(255,130,170,0.5);
-        }
-
-        .countdown-label {
-            color: rgba(255,255,255,0.5);
-            font-size: 0.75em;
-            letter-spacing: 2px;
-            margin-top: 4px;
-        }
-
-        /* ========== NAV DOTS ========== */
-        .nav-dots {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-            margin-top: 24px;
-        }
-
-        .nav-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.2);
-            cursor: pointer;
-            transition: all 0.4s;
-        }
-
-        .nav-dot.active {
-            background: #ff6090;
-            box-shadow: 0 0 15px rgba(255,100,150,0.7);
-            transform: scale(1.3);
-        }
-
-        /* ========== PARTICLES ========== */
-        .particles-container {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            pointer-events: none;
-            z-index: 500;
-        }
-
-        .particle {
-            position: absolute;
-            pointer-events: none;
-            animation: particleBurst 1.5s ease-out forwards;
-        }
-
-        @keyframes particleBurst {
-            0% { opacity: 1; transform: translate(0,0) scale(1) rotate(0deg); }
-            100% { opacity: 0; transform: translate(var(--tx), var(--ty)) scale(0) rotate(var(--tr)); }
-        }
-
-        /* ========== OVERLAY / POPUP ========== */
-        .overlay {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.75);
-            backdrop-filter: blur(15px);
-            z-index: 600;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.5s ease;
-        }
-
-        .overlay.show {
-            opacity: 1;
-            pointer-events: all;
-        }
-
-        .result-card {
-            background: rgba(25, 5, 50, 0.95);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 25px;
-            padding: 45px 35px;
-            text-align: center;
-            max-width: 440px;
-            width: 85vw;
-            box-shadow: 0 0 120px rgba(255, 80, 130, 0.35);
-            animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-
-        @keyframes popIn {
-            0% { transform: scale(0.4); opacity: 0; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-
-        .result-emoji {
-            font-size: 100px;
-            animation: heartBeat 0.8s ease-in-out infinite;
-        }
-
-        .result-text {
-            color: white;
-            font-size: 1.8em;
-            font-weight: 700;
-            margin: 18px 0;
-            letter-spacing: 3px;
-        }
-
-        .result-sub {
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 0.95em;
-            letter-spacing: 2px;
-            line-height: 1.8;
-            white-space: pre-line;
-        }
-
-        .close-btn {
-            margin-top: 22px;
-            padding: 12px 35px;
-            border-radius: 50px;
-            background: rgba(255, 255, 255, 0.12);
-            border: 1px solid rgba(255, 255, 255, 0.25);
-            color: white;
-            font-size: 1em;
-            cursor: pointer;
-            letter-spacing: 2px;
-            transition: all 0.3s ease;
-            font-family: inherit;
-        }
-
-        .close-btn:hover {
-            background: rgba(255, 255, 255, 0.25);
-            transform: scale(1.05);
-        }
-
-        /* ========== MUSIC HINT ========== */
-        .music-hint {
-            position: fixed;
-            bottom: 25px;
-            right: 25px;
-            z-index: 50;
-            color: rgba(255,255,255,0.4);
-            font-size: 0.8em;
-            letter-spacing: 2px;
-            cursor: pointer;
-            transition: all 0.3s;
-            animation: pulse 2s ease-in-out infinite;
-        }
-
-        .music-hint:hover {
-            color: rgba(255,255,255,0.7);
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 0.4; }
-            50% { opacity: 0.8; }
-        }
-
-        /* ========== RESPONSIVE ========== */
-        @media (max-width: 600px) {
-            .card {
-                padding: 30px 22px;
-                border-radius: 22px;
-            }
-            .title { font-size: 1.8em; letter-spacing: 3px; }
-            .message { font-size: 0.95em; line-height: 1.8; }
-            .btn { padding: 11px 28px; font-size: 0.95em; letter-spacing: 2px; }
-            .heart-icon { font-size: 55px; }
-            .countdown-num { font-size: 1.5em; }
-            .countdown-item { padding: 10px 12px; min-width: 55px; }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NexusAI — AI驱动下一代创作革命</title>
+<style>
+/* ═══════════════════════════════════════════
+   DESIGN SYSTEM — Futuristic / Glassmorphism
+   ═══════════════════════════════════════════ */
+:root {
+  --bg-deep: #06060f;
+  --glass: rgba(255,255,255,0.04);
+  --glass-hover: rgba(255,255,255,0.08);
+  --glass-border: rgba(255,255,255,0.08);
+  --glass-border-hover: rgba(255,255,255,0.18);
+  --text-primary: #f0f0f5;
+  --text-secondary: #9090a8;
+  --text-tertiary: #606078;
+  --accent-1: #818cf8;
+  --accent-2: #22d3ee;
+  --accent-3: #f472b6;
+  --accent-4: #a78bfa;
+  --gradient-hero: linear-gradient(135deg, #818cf8 0%, #22d3ee 40%, #f472b6 70%, #a78bfa 100%);
+  --gradient-subtle: linear-gradient(135deg, rgba(129,140,248,0.15), rgba(34,211,238,0.1));
+  --radius-sm: 12px;
+  --radius-md: 20px;
+  --radius-lg: 28px;
+  --transition-fast: 0.2s cubic-bezier(0.4,0,0.2,1);
+  --transition-smooth: 0.4s cubic-bezier(0.4,0,0.2,1);
+  --transition-spring: 0.5s cubic-bezier(0.34,1.56,0.64,1);
+  --font-display: "SF Pro Display","Inter","PingFang SC","Microsoft YaHei",sans-serif;
+  --font-body: "SF Pro Text","Inter","PingFang SC","Microsoft YaHei",sans-serif;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg-deep);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  overflow-x: hidden;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ═══════════════════ Canvas Background ═══════════════════ */
+#particleCanvas {
+  position: fixed; top:0; left:0; width:100%; height:100%;
+  z-index: 0; pointer-events: none;
+}
+
+/* ═══════════════════ Mouse Glow ═══════════════════ */
+.mouse-glow {
+  position: fixed; pointer-events: none; z-index: 1;
+  width: 500px; height: 500px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(129,140,248,0.12) 0%, rgba(34,211,238,0.05) 30%, transparent 70%);
+  transform: translate(-50%, -50%);
+  transition: opacity 0.3s;
+}
+
+/* ═══════════════════ Navbar ═══════════════════ */
+.nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  padding: 16px 32px;
+  display: flex; align-items: center; justify-content: space-between;
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  background: rgba(6,6,15,0.6);
+  border-bottom: 1px solid var(--glass-border);
+  transition: var(--transition-smooth);
+}
+.nav.scrolled { background: rgba(6,6,15,0.85); }
+.nav-logo {
+  font-family: var(--font-display);
+  font-size: 1.3rem; font-weight: 700;
+  letter-spacing: -0.5px;
+  background: var(--gradient-hero); -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent; background-clip: text;
+}
+.nav-links { display: flex; gap: 28px; align-items: center; }
+.nav-links a {
+  color: var(--text-secondary); text-decoration: none;
+  font-size: 0.88rem; font-weight: 500;
+  transition: var(--transition-fast); letter-spacing: 0.3px;
+}
+.nav-links a:hover { color: var(--text-primary); }
+.nav-cta {
+  padding: 8px 20px; border-radius: 50px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.15);
+  color: var(--text-primary) !important;
+  font-size: 0.85rem !important;
+  transition: var(--transition-smooth) !important;
+}
+.nav-cta:hover {
+  background: rgba(255,255,255,0.14) !important;
+  border-color: rgba(255,255,255,0.3) !important;
+}
+
+/* ═══════════════════ Sections ═══════════════════ */
+.section { position: relative; z-index: 2; padding: 100px 32px; }
+
+/* ═══════════════════ Hero ═══════════════════ */
+.hero {
+  min-height: 100vh; display: flex; align-items: center; justify-content: center;
+  text-align: center; padding-top: 80px;
+}
+.hero-content { max-width: 900px; }
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 6px 18px; border-radius: 50px;
+  background: var(--glass); border: 1px solid var(--glass-border);
+  font-size: 0.82rem; color: var(--text-secondary);
+  margin-bottom: 32px; animation: fadeInUp 0.8s ease-out;
+  backdrop-filter: blur(10px);
+}
+.hero-badge .dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: #22d3ee; animation: pulse-dot 2s infinite;
+}
+.hero-title {
+  font-family: var(--font-display);
+  font-size: clamp(3rem, 7vw, 5.5rem);
+  font-weight: 700; letter-spacing: -2px;
+  line-height: 1.08; margin-bottom: 24px;
+  animation: fadeInUp 0.8s 0.1s both ease-out;
+}
+.hero-title .gradient-text {
+  background: var(--gradient-hero);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.hero-subtitle {
+  font-size: clamp(1rem, 2vw, 1.3rem);
+  color: var(--text-secondary); max-width: 560px;
+  margin: 0 auto 48px; line-height: 1.7;
+  animation: fadeInUp 0.8s 0.2s both ease-out;
+}
+.hero-actions {
+  display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;
+  animation: fadeInUp 0.8s 0.3s both ease-out;
+}
+
+/* ═══════════════════ Buttons ═══════════════════ */
+.btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 14px 32px; border-radius: 50px;
+  font-family: var(--font-body); font-size: 0.95rem; font-weight: 600;
+  text-decoration: none; cursor: pointer; border: none;
+  letter-spacing: 0.3px; position: relative; overflow: hidden;
+  transition: var(--transition-spring);
+}
+.btn-primary {
+  background: linear-gradient(135deg, #6366f1, #818cf8);
+  color: #fff; box-shadow: 0 0 40px rgba(99,102,241,0.3), 0 8px 24px rgba(99,102,241,0.2);
+}
+.btn-primary:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 0 60px rgba(99,102,241,0.5), 0 12px 32px rgba(99,102,241,0.3);
+}
+.btn-secondary {
+  background: var(--glass); color: var(--text-primary);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(10px);
+}
+.btn-secondary:hover {
+  background: var(--glass-hover); border-color: var(--glass-border-hover);
+  transform: translateY(-3px);
+}
+.btn-float { animation: float 6s ease-in-out infinite; }
+.btn-float:nth-child(2) { animation-delay: -3s; }
+
+/* ═══════════════════ Section Headers ═══════════════════ */
+.section-label {
+  font-size: 0.78rem; font-weight: 600; letter-spacing: 3px;
+  text-transform: uppercase; color: var(--accent-2);
+  margin-bottom: 12px;
+}
+.section-title {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 4vw, 3.2rem);
+  font-weight: 700; letter-spacing: -1px;
+  margin-bottom: 16px; line-height: 1.15;
+}
+.section-desc {
+  color: var(--text-secondary); font-size: 1.05rem;
+  max-width: 520px; line-height: 1.7;
+}
+.text-center { text-align: center; }
+.mx-auto { margin-left: auto; margin-right: auto; }
+
+/* ═══════════════════ Works Grid ═══════════════════ */
+.works-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px; margin-top: 48px;
+}
+.work-card {
+  position: relative; border-radius: var(--radius-md);
+  overflow: hidden; cursor: pointer;
+  background: var(--glass); border: 1px solid var(--glass-border);
+  backdrop-filter: blur(20px);
+  transition: var(--transition-smooth);
+}
+.work-card:hover {
+  transform: translateY(-8px) scale(1.02);
+  border-color: var(--glass-border-hover);
+  box-shadow: 0 24px 60px rgba(0,0,0,0.4), 0 0 40px rgba(129,140,248,0.1);
+}
+.work-card.tall { grid-row: span 2; }
+.work-card.wide { grid-column: span 2; }
+.work-img {
+  width: 100%; height: 220px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 3.5rem; position: relative; overflow: hidden;
+}
+.work-img::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(180deg, transparent 50%, rgba(6,6,15,0.9) 100%);
+}
+.work-card.tall .work-img { height: 400px; }
+.work-body {
+  padding: 20px; position: relative; z-index: 1;
+}
+.work-tag {
+  display: inline-block; padding: 4px 12px; border-radius: 50px;
+  font-size: 0.7rem; font-weight: 600;
+  background: rgba(129,140,248,0.15); color: var(--accent-1);
+  margin-bottom: 8px;
+}
+.work-title {
+  font-size: 1.1rem; font-weight: 600; margin-bottom: 4px;
+}
+.work-desc { font-size: 0.82rem; color: var(--text-tertiary); }
+
+/* ═══════════════════ Stats ═══════════════════ */
+.stats-section {
+  padding: 80px 0;
+}
+.stats-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 2px; max-width: 900px; margin: 0 auto;
+  background: var(--glass-border); border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+.stat-item {
+  background: rgba(10,10,20,0.8); padding: 40px 24px; text-align: center;
+  backdrop-filter: blur(20px);
+}
+.stat-number {
+  font-family: var(--font-display);
+  font-size: clamp(2.4rem, 5vw, 3.5rem); font-weight: 700;
+  background: var(--gradient-hero); -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent; background-clip: text;
+  letter-spacing: -1px;
+}
+.stat-label { color: var(--text-secondary); font-size: 0.9rem; margin-top: 4px; }
+
+/* ═══════════════════ Capabilities ═══════════════════ */
+.caps-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 16px; margin-top: 48px;
+}
+.cap-card {
+  padding: 32px 24px; border-radius: var(--radius-md);
+  background: var(--glass); border: 1px solid var(--glass-border);
+  backdrop-filter: blur(20px); text-align: center;
+  transition: var(--transition-smooth);
+}
+.cap-card:hover {
+  background: var(--glass-hover); border-color: var(--glass-border-hover);
+  transform: translateY(-4px);
+  box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+}
+.cap-icon {
+  width: 64px; height: 64px; margin: 0 auto 20px;
+  border-radius: var(--radius-sm);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.8rem;
+  background: var(--gradient-subtle);
+  border: 1px solid rgba(255,255,255,0.08);
+}
+.cap-name { font-weight: 600; font-size: 1.05rem; margin-bottom: 6px; }
+.cap-desc { font-size: 0.82rem; color: var(--text-tertiary); }
+
+/* ═══════════════════ Testimonials / Cases ═══════════════════ */
+.cases-scroll {
+  display: flex; gap: 20px; margin-top: 48px;
+  overflow-x: auto; scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 16px;
+}
+.cases-scroll::-webkit-scrollbar { height: 4px; }
+.cases-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
+.case-card {
+  min-width: 340px; scroll-snap-align: start;
+  padding: 28px; border-radius: var(--radius-md);
+  background: var(--glass); border: 1px solid var(--glass-border);
+  backdrop-filter: blur(20px); flex-shrink: 0;
+  transition: var(--transition-smooth);
+}
+.case-card:hover {
+  border-color: var(--glass-border-hover); background: var(--glass-hover);
+}
+.case-avatar {
+  width: 48px; height: 48px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.4rem; margin-bottom: 16px;
+  background: var(--gradient-subtle);
+}
+.case-text { font-size: 0.9rem; color: var(--text-secondary); line-height: 1.7; margin-bottom: 16px; }
+.case-author { font-weight: 600; font-size: 0.88rem; }
+.case-role { font-size: 0.75rem; color: var(--text-tertiary); }
+
+/* ═══════════════════ Footer ═══════════════════ */
+.footer {
+  position: relative; z-index: 2;
+  padding: 60px 32px 32px;
+  background: linear-gradient(180deg, transparent 0%, rgba(99,102,241,0.05) 40%, rgba(6,6,15,1) 100%);
+  border-top: 1px solid var(--glass-border);
+}
+.footer-grid {
+  display: grid; grid-template-columns: 2fr 1fr 1fr;
+  gap: 40px; max-width: 1000px; margin: 0 auto 40px;
+}
+.footer-brand { font-family: var(--font-display); font-size: 1.3rem; font-weight: 700; }
+.footer-desc { color: var(--text-tertiary); font-size: 0.85rem; margin-top: 8px; }
+.footer-col h4 { font-size: 0.78rem; letter-spacing: 1px; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 16px; }
+.footer-col a { display: block; color: var(--text-tertiary); text-decoration: none; font-size: 0.85rem; margin-bottom: 8px; transition: var(--transition-fast); }
+.footer-col a:hover { color: var(--text-primary); }
+.social-links { display: flex; gap: 12px; margin-top: 16px; }
+.social-link {
+  width: 36px; height: 36px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--glass); border: 1px solid var(--glass-border);
+  color: var(--text-secondary); text-decoration: none;
+  transition: var(--transition-smooth); font-size: 0.9rem;
+}
+.social-link:hover { background: var(--glass-hover); color: var(--text-primary); border-color: var(--glass-border-hover); }
+.footer-bottom {
+  text-align: center; padding-top: 24px;
+  border-top: 1px solid var(--glass-border);
+  color: var(--text-tertiary); font-size: 0.78rem;
+}
+
+/* ═══════════════════ Animations ═══════════════════ */
+@keyframes fadeInUp {
+  from { opacity:0; transform:translateY(32px); }
+  to { opacity:1; transform:translateY(0); }
+}
+@keyframes float {
+  0%,100% { transform:translateY(0); }
+  50% { transform:translateY(-8px); }
+}
+@keyframes pulse-dot {
+  0%,100% { opacity:1; box-shadow: 0 0 6px #22d3ee; }
+  50% { opacity:0.5; box-shadow: 0 0 16px #22d3ee; }
+}
+@keyframes shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+.reveal {
+  opacity: 0; transform: translateY(40px);
+  transition: opacity 0.8s ease-out, transform 0.8s cubic-bezier(0.4,0,0.2,1);
+}
+.reveal.visible { opacity: 1; transform: translateY(0); }
+
+/* ═══════════════════ Responsive ═══════════════════ */
+@media (max-width: 768px) {
+  .nav-links { display: none; }
+  .section { padding: 60px 20px; }
+  .stats-grid { grid-template-columns: 1fr; }
+  .works-grid { grid-template-columns: 1fr; }
+  .work-card.wide { grid-column: span 1; }
+  .work-card.tall .work-img { height: 220px; }
+  .caps-grid { grid-template-columns: 1fr 1fr; }
+  .footer-grid { grid-template-columns: 1fr; gap: 24px; }
+  .case-card { min-width: 280px; }
+  .hero-title { font-size: clamp(2.2rem, 8vw, 3.5rem); }
+}
+@media (max-width: 400px) {
+  .caps-grid { grid-template-columns: 1fr; }
+  .hero-actions { flex-direction: column; }
+}
+
+/* ═══════════════════ Demo Modal ═══════════════════ */
+.demo-overlay {
+  position: fixed; inset: 0; z-index: 200;
+  background: rgba(3,3,10,0.92);
+  backdrop-filter: blur(30px);
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.4s ease-out;
+}
+.demo-overlay.open { opacity: 1; pointer-events: auto; }
+.demo-modal {
+  width: 90%; max-width: 800px; max-height: 90vh;
+  border-radius: var(--radius-lg);
+  background: linear-gradient(145deg, rgba(15,15,35,0.95), rgba(8,8,20,0.98));
+  border: 1px solid var(--glass-border);
+  overflow: hidden;
+  display: flex; flex-direction: column;
+  box-shadow: 0 40px 100px rgba(0,0,0,0.6), 0 0 80px rgba(99,102,241,0.15);
+  transform: translateY(20px) scale(0.97);
+  transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1);
+}
+.demo-overlay.open .demo-modal { transform: translateY(0) scale(1); }
+.demo-close {
+  position: absolute; top: 16px; right: 16px; z-index: 10;
+  width: 36px; height: 36px; border-radius: 50%;
+  background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
+  color: var(--text-secondary); cursor: pointer; font-size: 1rem;
+  display: flex; align-items: center; justify-content: center;
+  transition: var(--transition-fast);
+}
+.demo-close:hover { background: rgba(255,255,255,0.15); color: #fff; }
+.demo-tabs {
+  display: flex; gap: 0; border-bottom: 1px solid var(--glass-border);
+  padding: 0 24px;
+}
+.demo-tab {
+  padding: 16px 20px; cursor: pointer; font-size: 0.85rem;
+  font-weight: 500; color: var(--text-tertiary);
+  border-bottom: 2px solid transparent;
+  transition: var(--transition-fast);
+  background: none; border-top: none; border-left: none; border-right: none;
+  font-family: inherit; letter-spacing: 0.3px;
+}
+.demo-tab:hover { color: var(--text-secondary); }
+.demo-tab.active { color: var(--text-primary); border-bottom-color: var(--accent-1); }
+.demo-body { flex: 1; overflow-y: auto; padding: 28px 24px; position: relative; min-height: 400px; }
+.demo-prompt-wrap {
+  display: flex; gap: 10px; margin-bottom: 20px;
+}
+.demo-input {
+  flex: 1; padding: 14px 18px; border-radius: 50px;
+  border: 1px solid var(--glass-border);
+  background: rgba(255,255,255,0.04);
+  color: var(--text-primary); font-size: 0.95rem;
+  outline: none; font-family: inherit;
+  transition: var(--transition-fast);
+}
+.demo-input:focus { border-color: var(--glass-border-hover); background: rgba(255,255,255,0.07); }
+.demo-input::placeholder { color: var(--text-tertiary); }
+.demo-generate {
+  padding: 14px 28px; border-radius: 50px; cursor: pointer;
+  background: var(--gradient-hero); border: none; color: #fff;
+  font-weight: 600; font-size: 0.9rem; font-family: inherit;
+  white-space: nowrap; transition: var(--transition-spring);
+  letter-spacing: 0.3px;
+}
+.demo-generate:hover { transform: scale(1.03); box-shadow: 0 0 30px rgba(129,140,248,0.4); }
+.demo-generate:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+.demo-suggestions {
+  display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px;
+}
+.demo-chip {
+  padding: 7px 16px; border-radius: 50px; cursor: pointer;
+  background: var(--glass); border: 1px solid var(--glass-border);
+  color: var(--text-secondary); font-size: 0.78rem;
+  transition: var(--transition-fast); font-family: inherit;
+}
+.demo-chip:hover { background: var(--glass-hover); color: var(--text-primary); border-color: var(--glass-border-hover); }
+.demo-result {
+  position: relative; border-radius: var(--radius-md);
+  border: 1px solid var(--glass-border);
+  background: var(--glass); min-height: 280px;
+  overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+}
+.demo-result canvas { display: block; width: 100%; height: 100%; }
+.demo-loading {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 16px; z-index: 5; pointer-events: none;
+}
+.demo-loading-bar {
+  width: 200px; height: 3px; border-radius: 3px;
+  background: var(--glass-border); overflow: hidden;
+}
+.demo-loading-fill {
+  height: 100%; border-radius: 3px;
+  background: var(--gradient-hero);
+  animation: loadingProgress 2.5s ease-in-out;
+  width: 0%;
+}
+@keyframes loadingProgress {
+  0% { width: 0%; }
+  30% { width: 25%; }
+  60% { width: 55%; }
+  85% { width: 85%; }
+  100% { width: 100%; }
+}
+.demo-loading-text { font-size: 0.85rem; color: var(--text-tertiary); }
+.demo-result-preview {
+  padding: 30px; display: flex; flex-direction: column; align-items: center;
+  gap: 12px; width: 100%;
+}
+.demo-web-frame {
+  width: 100%; height: 300px; border-radius: 12px;
+  border: 1px solid var(--glass-border);
+  overflow: hidden; position: relative;
+}
+.demo-web-header {
+  height: 36px; display: flex; align-items: center; gap: 6px;
+  padding: 0 12px; background: rgba(255,255,255,0.03);
+  border-bottom: 1px solid var(--glass-border);
+}
+.demo-web-dot { width: 8px; height: 8px; border-radius: 50%; }
+.demo-web-content { padding: 20px; font-size: 0.85rem; color: var(--text-secondary); line-height: 1.7; }
+@media (max-width: 600px) {
+  .demo-modal { max-height: 95vh; }
+  .demo-prompt-wrap { flex-direction: column; }
+  .demo-body { padding: 16px; }
+  .demo-tabs { padding: 0 12px; overflow-x: auto; }
+}
+</style>
 </head>
 <body>
 
-    <!-- ===== 动漫背景图层 ===== -->
-    <!-- 🔴🔴🔴 替换下方 URL 为你的动漫 JK/DK 相拥照片 🔴🔴🔴 -->
-    <div class="bg-image" id="bgImage"></div>
-    <div class="bg-gradient-overlay"></div>
-    <div class="bg-vignette"></div>
+<canvas id="particleCanvas"></canvas>
+<div class="mouse-glow" id="mouseGlow"></div>
 
-    <!-- ===== 樱花飘落 ===== -->
-    <div class="sakura-container" id="sakura"></div>
+<!-- ═══════════════════ Navbar ═══════════════════ -->
+<nav class="nav" id="nav">
+  <div class="nav-logo">NexusAI</div>
+  <div class="nav-links">
+    <a href="#works">作品</a>
+    <a href="#capabilities">能力</a>
+    <a href="#cases">案例</a>
+    <a href="#stats">数据</a>
+    <a href="#" class="nav-cta">开始使用</a>
+  </div>
+</nav>
 
-    <!-- ===== 粒子容器 ===== -->
-    <div class="particles-container" id="particles"></div>
-
-    <!-- ===== 页面系统 ===== -->
-    <div class="pages-wrapper">
-
-        <!-- ======== PAGE 1: 告白主页 ======== -->
-        <div class="page active" id="page1">
-            <div class="card">
-                <div class="heart-icon" onclick="burstHere(event)" title="点我~">💖</div>
-                <h1 class="title">我喜欢你</h1>
-                <p class="subtitle">—— 写给最特别的你 ——</p>
-                <div class="divider"><div class="divider-dot"></div></div>
-                <p class="message">
-                    从遇见你的那一刻起，<br>
-                    我的世界就变得<span class="highlight">不一样</span>了。<br>
-                    你的笑容，是我每天最期待的<span class="highlight">阳光</span>；<br>
-                    你的声音，是我听过最美的<span class="highlight">旋律</span>。<br>
-                    我希望能成为那个<br>
-                    陪你走过春夏秋冬的<span class="highlight">人</span>。
-                </p>
-                <div class="divider"><div class="divider-dot"></div></div>
-                <div class="typing-line">
-                    <span id="typedText"></span><span class="cursor"></span>
-                </div>
-                <div class="buttons">
-                    <button class="btn btn-yes" onclick="sayYes()">💕 我愿意</button>
-                    <button class="btn btn-maybe" id="btnMaybe" onclick="sayMaybe()">让我想想</button>
-                </div>
-            </div>
-            <div class="nav-dots">
-                <span class="nav-dot active" onclick="goToPage(0)"></span>
-                <span class="nav-dot" onclick="goToPage(1)"></span>
-                <span class="nav-dot" onclick="goToPage(2)"></span>
-                <span class="nav-dot" onclick="goToPage(3)"></span>
-            </div>
-        </div>
-
-        <!-- ======== PAGE 2: 喜欢你的理由 + 爱心指数 ======== -->
-        <div class="page" id="page2">
-            <div class="card">
-                <div class="heart-icon">💗</div>
-                <h1 class="title" style="font-size:1.8em;">喜欢你的 10 个理由</h1>
-                <div class="divider"><div class="divider-dot"></div></div>
-                <ul class="reasons-list" id="reasonsList">
-                    <li>你的笑容，比樱花还美</li>
-                    <li>你认真做事的样子，让我心动</li>
-                    <li>和你聊天，时间总是过得特别快</li>
-                    <li>你的声音，能治愈一切不开心</li>
-                    <li>你善良又温柔，像春天的风</li>
-                    <li>你偶尔的小任性，也很可爱</li>
-                    <li>你让我想变成更好的人</li>
-                    <li>有你在身边，连雨天都觉得浪漫</li>
-                    <li>你的眼睛里有星星</li>
-                    <li>因为是你，所以喜欢 🌸</li>
-                </ul>
-
-                <!-- 爱心指数 -->
-                <div class="meter-section" style="margin-top:20px;">
-                    <div class="meter-label">💘 我对你的喜欢程度</div>
-                    <div class="meter-bar-outer">
-                        <div class="meter-bar-inner" id="loveMeter"></div>
-                    </div>
-                    <div class="meter-value" id="loveMeterValue">0%</div>
-                </div>
-
-                <button class="btn btn-next" onclick="goToPage(2)">继续往下看 →</button>
-            </div>
-            <div class="nav-dots">
-                <span class="nav-dot" onclick="goToPage(0)"></span>
-                <span class="nav-dot active" onclick="goToPage(1)"></span>
-                <span class="nav-dot" onclick="goToPage(2)"></span>
-                <span class="nav-dot" onclick="goToPage(3)"></span>
-            </div>
-        </div>
-
-        <!-- ======== PAGE 3: 想和你做的事 + 承诺 ======== -->
-        <div class="page" id="page3">
-            <div class="card">
-                <div class="heart-icon">💝</div>
-                <h1 class="title" style="font-size:1.8em;">想和你一起做的事</h1>
-                <div class="divider"><div class="divider-dot"></div></div>
-                <div class="promise-box">
-                    <div class="check-item" onclick="toggleCheck(this)">
-                        <span class="check-box">✓</span> 一起看一场樱花雨 🌸
-                    </div>
-                    <div class="check-item" onclick="toggleCheck(this)">
-                        <span class="check-box">✓</span> 在夏天的夜晚看星星 ✨
-                    </div>
-                    <div class="check-item" onclick="toggleCheck(this)">
-                        <span class="check-box">✓</span> 手牵手走过秋天的银杏大道 🍂
-                    </div>
-                    <div class="check-item" onclick="toggleCheck(this)">
-                        <span class="check-box">✓</span> 冬天一起喝热可可 ☕
-                    </div>
-                    <div class="check-item" onclick="toggleCheck(this)">
-                        <span class="check-box">✓</span> 一起去海边看日出 🌅
-                    </div>
-                    <div class="check-item" onclick="toggleCheck(this)">
-                        <span class="check-box">✓</span> 陪你逛遍所有有趣的小店 🛍️
-                    </div>
-                    <div class="check-item" onclick="toggleCheck(this)">
-                        <span class="check-box">✓</span> 给你做好吃的，看你笑 🍰
-                    </div>
-                    <div class="check-item" onclick="toggleCheck(this)">
-                        <span class="check-box">✓</span> 一起慢慢变老 💑
-                    </div>
-                </div>
-                <p style="color:rgba(255,255,255,0.5);font-size:0.85em;letter-spacing:2px;">
-                    点击每一条来打勾 ✓
-                </p>
-                <button class="btn btn-next" onclick="goToPage(3)">还有惊喜 →</button>
-            </div>
-            <div class="nav-dots">
-                <span class="nav-dot" onclick="goToPage(0)"></span>
-                <span class="nav-dot" onclick="goToPage(1)"></span>
-                <span class="nav-dot active" onclick="goToPage(2)"></span>
-                <span class="nav-dot" onclick="goToPage(3)"></span>
-            </div>
-        </div>
-
-        <!-- ======== PAGE 4: 倒计时 + 最终告白 ======== -->
-        <div class="page" id="page4">
-            <div class="card">
-                <div class="heart-icon">💘</div>
-                <h1 class="title" style="font-size:1.8em;">我们在一起已经</h1>
-                <div class="divider"><div class="divider-dot"></div></div>
-                <div class="countdown-digits" id="countdown">
-                    <div class="countdown-item">
-                        <div class="countdown-num" id="cd-days">0</div>
-                        <div class="countdown-label">天</div>
-                    </div>
-                    <div class="countdown-item">
-                        <div class="countdown-num" id="cd-hours">0</div>
-                        <div class="countdown-label">小时</div>
-                    </div>
-                    <div class="countdown-item">
-                        <div class="countdown-num" id="cd-mins">0</div>
-                        <div class="countdown-label">分钟</div>
-                    </div>
-                    <div class="countdown-item">
-                        <div class="countdown-num" id="cd-secs">0</div>
-                        <div class="countdown-label">秒</div>
-                    </div>
-                </div>
-                <p style="color:rgba(255,255,255,0.55);font-size:0.8em;letter-spacing:2px;margin-top:8px;">
-                    从你答应我的那一刻开始计时 ❤️
-                </p>
-                <div class="divider"><div class="divider-dot"></div></div>
-                <p class="message">
-                    所以……<br>
-                    你愿意<br>
-                    做我的<span class="highlight">女朋友</span>吗？
-                </p>
-                <div class="buttons">
-                    <button class="btn btn-yes" onclick="sayYes()" style="font-size:1.2em; padding: 16px 50px;">
-                        💖 我愿意！
-                    </button>
-                </div>
-                <button class="btn btn-next" onclick="goToPage(0)">← 回到第一页</button>
-            </div>
-            <div class="nav-dots">
-                <span class="nav-dot" onclick="goToPage(0)"></span>
-                <span class="nav-dot" onclick="goToPage(1)"></span>
-                <span class="nav-dot" onclick="goToPage(2)"></span>
-                <span class="nav-dot active" onclick="goToPage(3)"></span>
-            </div>
-        </div>
-
+<!-- ═══════════════════ Hero ═══════════════════ -->
+<section class="hero section">
+  <div class="hero-content">
+    <div class="hero-badge"><span class="dot"></span> NexusAI v3.0 正式发布</div>
+    <h1 class="hero-title">
+      AI驱动<br><span class="gradient-text">下一代创作革命</span>
+    </h1>
+    <p class="hero-subtitle">
+      让文字、图片、视频与创意无限连接。
+      全新多模态引擎，为每一个想法赋予生命。
+    </p>
+    <div class="hero-actions">
+      <a href="#" class="btn btn-primary btn-float" id="btnTry">✨ 立即体验</a>
+      <a href="#" class="btn btn-secondary btn-float" id="btnDemo">▶ 查看演示</a>
     </div>
+  </div>
+</section>
 
-    <!-- ===== 成功弹窗 ===== -->
-    <div class="overlay" id="overlay">
-        <div class="result-card" id="resultCard"></div>
+<!-- ═══════════════════ Works ═══════════════════ -->
+<section class="section" id="works">
+  <div class="section-label reveal">✦ 作品展示</div>
+  <h2 class="section-title reveal">AI 创造力工坊</h2>
+  <p class="section-desc reveal">每一个像素都经过神经网络精心雕琢，呈现前所未有的视觉体验。</p>
+  <div class="works-grid">
+    <div class="work-card tall reveal">
+      <div class="work-img" style="background:linear-gradient(135deg,#1a0533,#0d1b3e,#0a1628);">🌌</div>
+      <div class="work-body">
+        <span class="work-tag">AI 绘画</span>
+        <div class="work-title">赛博都市·霓虹之夜</div>
+        <div class="work-desc">Stable Diffusion + 自研 LoRA 模型生成</div>
+      </div>
     </div>
-
-    <!-- ===== 音乐提示 ===== -->
-    <div class="music-hint" onclick="toggleMusic()" title="点击播放/暂停背景音乐">
-        🎵 点击播放音乐
+    <div class="work-card reveal">
+      <div class="work-img" style="background:linear-gradient(135deg,#0a1a2a,#1a3040,#0d2835);">🎬</div>
+      <div class="work-body">
+        <span class="work-tag">AI 视频</span>
+        <div class="work-title">动态视觉叙事</div>
+        <div class="work-desc">文本到视频，60fps 电影级画质</div>
+      </div>
     </div>
+    <div class="work-card wide reveal">
+      <div class="work-img" style="background:linear-gradient(135deg,#1a0820,#2a1540,#1a0a2e);">🖥️</div>
+      <div class="work-body">
+        <span class="work-tag">AI 网页</span>
+        <div class="work-title">智能页面生成引擎</div>
+        <div class="work-desc">自然语言描述 → 生产级前端代码，React + Tailwind 原生输出</div>
+      </div>
+    </div>
+    <div class="work-card reveal">
+      <div class="work-img" style="background:linear-gradient(135deg,#051520,#0a2838,#082030);">📱</div>
+      <div class="work-body">
+        <span class="work-tag">AI 应用</span>
+        <div class="work-title">全栈应用工厂</div>
+        <div class="work-desc">从需求到部署，一键生成完整 SaaS</div>
+      </div>
+    </div>
+    <div class="work-card reveal">
+      <div class="work-img" style="background:linear-gradient(135deg,#1a1028,#2a1a40,#1a0a30);">🎨</div>
+      <div class="work-body">
+        <span class="work-tag">AI 设计</span>
+        <div class="work-title">品牌视觉系统</div>
+        <div class="work-desc">Logo、配色、字体，AI 一键生成完整品牌书</div>
+      </div>
+    </div>
+  </div>
+</section>
 
-    <!-- ===== 隐藏的 Audio ===== -->
-    <audio id="bgMusic" loop preload="none">
-        <!-- 把 src 换成你的音乐文件路径 -->
-        <!-- <source src="your-music.mp3" type="audio/mpeg"> -->
-        你的浏览器不支持音频播放
-    </audio>
+<!-- ═══════════════════ Stats ═══════════════════ -->
+<section class="section" id="stats">
+  <div class="stats-grid reveal">
+    <div class="stat-item">
+      <div class="stat-number" data-target="100">0</div>
+      <div class="stat-label">万+ 活跃用户</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-number" data-target="5000">0</div>
+      <div class="stat-label">万+ 生成内容</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-number" data-target="999" data-decimal="true">0</div>
+      <div class="stat-label">% 服务可用性</div>
+    </div>
+  </div>
+</section>
 
-    <script>
-        // ===========================
-        //  樱花飘落 (Sakura Petals)
-        // ===========================
-        const sakuraContainer = document.getElementById('sakura');
-        const petalColors = [
-            '#ffd1e0', '#ffc8da', '#ffbdd4', '#ffb8d0',
-            '#ffc4d8', '#ffe0ea', '#ffd6e3', '#ffcce0',
-            'rgba(255,200,215,0.7)', 'rgba(255,180,200,0.6)'
-        ];
+<!-- ═══════════════════ Capabilities ═══════════════════ -->
+<section class="section" id="capabilities">
+  <div class="text-center">
+    <div class="section-label reveal">✦ 核心能力</div>
+    <h2 class="section-title reveal">为创造者而生</h2>
+    <p class="section-desc mx-auto reveal">四大 AI 引擎协同工作，覆盖从灵感到交付的完整创作链路。</p>
+  </div>
+  <div class="caps-grid">
+    <div class="cap-card reveal">
+      <div class="cap-icon">🎨</div>
+      <div class="cap-name">AI 绘画</div>
+      <div class="cap-desc">文本生图 · 图生图 · 风格迁移 · 4K 超分辨率</div>
+    </div>
+    <div class="cap-card reveal">
+      <div class="cap-icon">🎬</div>
+      <div class="cap-name">AI 视频</div>
+      <div class="cap-desc">文生视频 · 视频风格化 · 动态分镜 · 自动剪辑</div>
+    </div>
+    <div class="cap-card reveal">
+      <div class="cap-icon">💻</div>
+      <div class="cap-name">AI 代码</div>
+      <div class="cap-desc">自然语言编程 · 代码审查 · 自动重构 · 全栈生成</div>
+    </div>
+    <div class="cap-card reveal">
+      <div class="cap-icon">✨</div>
+      <div class="cap-name">AI 设计</div>
+      <div class="cap-desc">UI/UX 生成 · 品牌系统 · 动效设计 · 设计转代码</div>
+    </div>
+  </div>
+</section>
 
-        function createSakuraPetal() {
-            const petal = document.createElement('div');
-            petal.className = 'sakura-petal';
+<!-- ═══════════════════ Cases ═══════════════════ -->
+<section class="section" id="cases">
+  <div class="text-center">
+    <div class="section-label reveal">✦ 用户案例</div>
+    <h2 class="section-title reveal">被顶尖团队信赖</h2>
+  </div>
+  <div class="cases-scroll reveal">
+    <div class="case-card">
+      <div class="case-avatar">🏢</div>
+      <div class="case-text">"NexusAI 让我们的设计团队效率提升了 10 倍。以前需要两周的品牌设计，现在两天就能交付。"</div>
+      <div class="case-author">张明远</div>
+      <div class="case-role">字节跳动 · 设计总监</div>
+    </div>
+    <div class="case-card">
+      <div class="case-avatar">🎮</div>
+      <div class="case-text">"游戏原画从概念到成品的时间缩短了 80%，AI 生成的风格一致性远超外包团队。"</div>
+      <div class="case-author">Alex Chen</div>
+      <div class="case-role">米哈游 · 艺术总监</div>
+    </div>
+    <div class="case-card">
+      <div class="case-avatar">🚀</div>
+      <div class="case-text">"用 NexusAI 生成的 landing page 直接上线，转化率比手写页面高了 35%。"</div>
+      <div class="case-author">Sarah Wang</div>
+      <div class="case-role">Linear · 产品负责人</div>
+    </div>
+    <div class="case-card">
+      <div class="case-avatar">🎬</div>
+      <div class="case-text">"AI 视频引擎帮助我们在 3 天内完成了原本需要 2 个月的动画短片。"</div>
+      <div class="case-author">李思涵</div>
+      <div class="case-role">追光动画 · 导演</div>
+    </div>
+  </div>
+</section>
 
-            const size = Math.random() * 16 + 10;
-            const left = Math.random() * 100;
-            const drift1 = (Math.random() - 0.5) * 120;
-            const drift2 = (Math.random() - 0.5) * 150;
-            const drift3 = (Math.random() - 0.5) * 100;
-            const drift4 = (Math.random() - 0.5) * 180;
-            const fallDur = Math.random() * 8 + 10;
-            const fallDelay = Math.random() * 15;
-            const color = petalColors[Math.floor(Math.random() * petalColors.length)];
-            const rotation = Math.random() * 360;
+<!-- ═══════════════════ Footer ═══════════════════ -->
+<footer class="footer">
+  <div class="footer-grid">
+    <div>
+      <div class="footer-brand" style="background:var(--gradient-hero);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">NexusAI</div>
+      <p class="footer-desc">AI 驱动的下一代创作平台。<br>让每一个想法，都成为杰作。</p>
+      <div class="social-links">
+        <a href="#" class="social-link">𝕏</a>
+        <a href="#" class="social-link">⬡</a>
+        <a href="#" class="social-link">▶</a>
+        <a href="#" class="social-link">◈</a>
+      </div>
+    </div>
+    <div class="footer-col">
+      <h4>产品</h4>
+      <a href="#">AI 绘画</a><a href="#">AI 视频</a><a href="#">AI 代码</a><a href="#">AI 设计</a><a href="#">定价</a>
+    </div>
+    <div class="footer-col">
+      <h4>公司</h4>
+      <a href="#">关于我们</a><a href="#">博客</a><a href="#">招聘</a><a href="#">联系我们</a><a href="#">隐私政策</a>
+    </div>
+  </div>
+  <div class="footer-bottom">© 2026 NexusAI. All rights reserved.  Designed with obsession.</div>
+</footer>
 
-            petal.style.cssText = `
-                left: ${left}%;
-                width: ${size}px;
-                height: ${size * 0.8}px;
-                background: ${color};
-                border-radius: 50% 0 50% 0;
-                transform: rotate(${rotation}deg);
-                --drift1: ${drift1}px;
-                --drift2: ${drift2}px;
-                --drift3: ${drift3}px;
-                --drift4: ${drift4}px;
-                --fall-dur: ${fallDur}s;
-                --fall-delay: ${fallDelay}s;
-                box-shadow: 0 0 6px rgba(255,180,200,0.4);
-            `;
+<!-- ═══════════════════ Demo Modal ═══════════════════ -->
+<div class="demo-overlay" id="demoOverlay">
+  <div class="demo-modal">
+    <button class="demo-close" id="demoClose">✕</button>
+    <div class="demo-tabs" id="demoTabs">
+      <button class="demo-tab active" data-mode="image">🎨 AI 绘画</button>
+      <button class="demo-tab" data-mode="web">🖥️ AI 网页</button>
+      <button class="demo-tab" data-mode="design">✨ AI 设计</button>
+    </div>
+    <div class="demo-body">
+      <div class="demo-prompt-wrap">
+        <input class="demo-input" id="demoInput" placeholder="描述你想要创作的内容…" />
+        <button class="demo-generate" id="demoGenerate">⚡ 生成</button>
+      </div>
+      <div class="demo-suggestions" id="demoSuggestions"></div>
+      <div class="demo-result" id="demoResult">
+        <p style="color:var(--text-tertiary);">👆 输入提示词开始 AI 创作</p>
+      </div>
+    </div>
+  </div>
+</div>
 
-            sakuraContainer.appendChild(petal);
+<script>
+// ═══════════════════════════════════════════
+//  Particle System Canvas
+// ═══════════════════════════════════════════
+const canvas = document.getElementById('particleCanvas');
+const ctx = canvas.getContext('2d');
+let particles = [];
+let mouse = { x: -1000, y: -1000 };
+let w, h;
 
-            // Cleanup old petals
-            const totalDur = (fallDur + fallDelay) * 1000 + 2000;
-            setTimeout(() => {
-                if (petal.parentNode) petal.remove();
-            }, totalDur);
-        }
+function resize() {
+  w = canvas.width = window.innerWidth;
+  h = canvas.height = window.innerHeight;
+}
+resize();
+window.addEventListener('resize', resize);
 
-        // Spawn sakura petals
-        for (let i = 0; i < 35; i++) {
-            setTimeout(() => createSakuraPetal(), i * 400);
-        }
-        setInterval(createSakuraPetal, 1500);
+class Particle {
+  constructor() {
+    this.reset();
+    this.y = Math.random() * h;
+  }
+  reset() {
+    this.x = Math.random() * w;
+    this.y = Math.random() * h;
+    this.vx = (Math.random() - 0.5) * 0.3;
+    this.vy = (Math.random() - 0.5) * 0.3;
+    this.size = Math.random() * 2 + 0.5;
+    this.opacity = Math.random() * 0.6 + 0.1;
+    this.life = Math.random() * 300 + 200;
+    this.age = 0;
+  }
+  update() {
+    this.age++;
+    if (this.age > this.life) this.reset();
+    // Flow toward mouse gently
+    let dx = mouse.x - this.x;
+    let dy = mouse.y - this.y;
+    let dist = Math.sqrt(dx*dx + dy*dy);
+    if (dist < 200) {
+      let force = (1 - dist/200) * 0.02;
+      this.vx += dx * force * 0.01;
+      this.vy += dy * force * 0.01;
+    }
+    // Damping
+    this.vx *= 0.999;
+    this.vy *= 0.999;
+    this.x += this.vx;
+    this.y += this.vy;
+    // Wrap
+    if (this.x < -20) this.x = w + 20;
+    if (this.x > w + 20) this.x = -20;
+    if (this.y < -20) this.y = h + 20;
+    if (this.y > h + 20) this.y = -20;
+  }
+  draw() {
+    let alpha = this.opacity;
+    // Fade at edges of life
+    if (this.age < 30) alpha *= this.age / 30;
+    if (this.age > this.life - 30) alpha *= (this.life - this.age) / 30;
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(129,140,248,${alpha * 0.5})`;
+    ctx.fill();
+    // Glow
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.size * 3, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(34,211,238,${alpha * 0.08})`;
+    ctx.fill();
+  }
+}
 
-        // ===========================
-        //  鼠标拖尾特效 (Sparkle Trail)
-        // ===========================
-        const trailEmojis = ['✨', '💫', '🌸', '💕', '⭐', '💖', '🩷', '🌟'];
-        let trailThrottle = 0;
+// Create particles
+const PARTICLE_COUNT = 120;
+for (let i = 0; i < PARTICLE_COUNT; i++) {
+  particles.push(new Particle());
+}
 
-        document.addEventListener('mousemove', (e) => {
-            trailThrottle++;
-            if (trailThrottle % 2 !== 0) return; // Throttle for performance
+// Draw connections between nearby particles
+function drawConnections() {
+  for (let i = 0; i < particles.length; i++) {
+    for (let j = i + 1; j < particles.length; j++) {
+      let dx = particles[i].x - particles[j].x;
+      let dy = particles[i].y - particles[j].y;
+      let dist = Math.sqrt(dx*dx + dy*dy);
+      if (dist < 120) {
+        let alpha = (1 - dist/120) * 0.12;
+        ctx.beginPath();
+        ctx.moveTo(particles[i].x, particles[i].y);
+        ctx.lineTo(particles[j].x, particles[j].y);
+        ctx.strokeStyle = `rgba(129,140,248,${alpha})`;
+        ctx.lineWidth = 0.5;
+        ctx.stroke();
+      }
+    }
+  }
+}
 
-            const sparkle = document.createElement('span');
-            sparkle.className = 'sparkle-trail';
-            sparkle.textContent = trailEmojis[Math.floor(Math.random() * trailEmojis.length)];
-            sparkle.style.cssText = `
-                left: ${e.clientX}px;
-                top: ${e.clientY}px;
-                font-size: ${Math.random() * 16 + 12}px;
-                --sx: ${(Math.random() - 0.5) * 60}px;
-                --sy: ${(Math.random() - 0.5) * 60 - 30}px;
-            `;
-            document.body.appendChild(sparkle);
-            setTimeout(() => sparkle.remove(), 1100);
-        });
+// Orbiting glow orbs
+let orbs = [];
+for (let i = 0; i < 3; i++) {
+  orbs.push({
+    cx: w * (0.2 + i * 0.3),
+    cy: h * (0.3 + i * 0.15),
+    r: 120 + i * 40,
+    angle: Math.random() * Math.PI * 2,
+    speed: 0.0002 + i * 0.0001,
+    color: i === 0 ? '129,140,248' : i === 1 ? '34,211,238' : '244,114,182',
+  });
+}
 
-        // ===========================
-        //  粒子爆炸
-        // ===========================
-        function createParticles(x, y) {
-            const container = document.getElementById('particles');
-            const emojis = ['❤️', '💕', '💖', '💗', '💝', '✨', '🌟', '💫', '🎉', '🥰', '🌸', '🎀'];
-            const count = 50;
+function animate() {
+  ctx.clearRect(0, 0, w, h);
 
-            for (let i = 0; i < count; i++) {
-                const particle = document.createElement('span');
-                particle.className = 'particle';
-                particle.textContent = emojis[Math.floor(Math.random() * emojis.length)];
-                const angle = (Math.PI * 2 * i) / count + Math.random() * 0.6;
-                const distance = 120 + Math.random() * 300;
-                const tx = Math.cos(angle) * distance;
-                const ty = Math.sin(angle) * distance - 60;
-                particle.style.cssText = `
-                    left: ${x}px;
-                    top: ${y}px;
-                    font-size: ${Math.random() * 26 + 16}px;
-                    --tx: ${tx}px;
-                    --ty: ${ty}px;
-                    --tr: ${Math.random() * 720 - 360}deg;
-                `;
-                container.appendChild(particle);
-                setTimeout(() => particle.remove(), 1600);
-            }
-        }
+  // Draw orbs
+  for (let orb of orbs) {
+    orb.angle += orb.speed;
+    let x = orb.cx + Math.cos(orb.angle) * 30;
+    let y = orb.cy + Math.sin(orb.angle * 1.3) * 20;
+    let gradient = ctx.createRadialGradient(x, y, 0, x, y, orb.r);
+    gradient.addColorStop(0, `rgba(${orb.color},0.06)`);
+    gradient.addColorStop(0.5, `rgba(${orb.color},0.02)`);
+    gradient.addColorStop(1, 'transparent');
+    ctx.fillStyle = gradient;
+    ctx.beginPath();
+    ctx.arc(x, y, orb.r, 0, Math.PI*2);
+    ctx.fill();
+  }
 
-        function burstHere(e) {
-            createParticles(e.clientX, e.clientY);
-        }
+  // Update and draw particles
+  for (let p of particles) {
+    p.update();
+    p.draw();
+  }
+  drawConnections();
 
-        // ===========================
-        //  打字效果
-        // ===========================
-        const typedText = document.getElementById('typedText');
-        const phrases = [
-            '你愿意做我的女朋友吗？',
-            '想和你一起看遍世间风景 🌅',
-            '你是我最想留住的幸运 🍀',
-            '往后余生，希望能有你 💑',
-            '遇见你，是我最大的幸运 ✨',
-        ];
-        let phraseIndex = 0;
-        let charIndex = 0;
-        let isDeleting = false;
-        let isWaiting = false;
+  requestAnimationFrame(animate);
+}
 
-        function typeLoop() {
-            const current = phrases[phraseIndex];
-            if (isWaiting) {
-                setTimeout(() => { isWaiting = false; isDeleting = true; typeLoop(); }, 2200);
-                return;
-            }
-            if (isDeleting) {
-                typedText.textContent = current.substring(0, charIndex - 1);
-                charIndex--;
-                if (charIndex === 0) {
-                    isDeleting = false;
-                    phraseIndex = (phraseIndex + 1) % phrases.length;
-                }
-            } else {
-                typedText.textContent = current.substring(0, charIndex + 1);
-                charIndex++;
-                if (charIndex === current.length) {
-                    isWaiting = true;
-                }
-            }
-            const speed = isDeleting ? 35 : isWaiting ? 0 : 75 + Math.random() * 55;
-            setTimeout(typeLoop, speed);
-        }
-        typeLoop();
+// Mouse tracking
+document.addEventListener('mousemove', e => {
+  mouse.x = e.clientX;
+  mouse.y = e.clientY;
+  const glow = document.getElementById('mouseGlow');
+  if (glow) {
+    glow.style.left = e.clientX + 'px';
+    glow.style.top = e.clientY + 'px';
+  }
+});
+document.addEventListener('mouseleave', () => { mouse.x = -1000; mouse.y = -1000; });
 
-        // ===========================
-        //  页面导航
-        // ===========================
-        const totalPages = 4;
-        let currentPage = 0;
+animate();
 
-        function goToPage(index) {
-            // Hide all pages
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            // Show target
-            const target = document.getElementById('page' + (index + 1));
-            if (target) {
-                target.classList.add('active');
-                // Re-trigger animation
-                target.style.animation = 'none';
-                target.offsetHeight;
-                target.style.animation = '';
-            }
-            currentPage = index;
-            updateNavDots();
+// ═══════════════════════════════════════════
+//  Scroll Reveal
+// ═══════════════════════════════════════════
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+    }
+  });
+}, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
 
-            // If page 2, animate love meter and reasons
-            if (index === 1) {
-                animateLoveMeter();
-                animateReasons();
-            }
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
-            // If page 3, reset checks animation
-            if (index === 2) {
-                resetChecks();
-            }
+// ═══════════════════════════════════════════
+//  Navbar scroll effect
+// ═══════════════════════════════════════════
+window.addEventListener('scroll', () => {
+  const nav = document.getElementById('nav');
+  if (window.scrollY > 50) nav.classList.add('scrolled');
+  else nav.classList.remove('scrolled');
+});
 
-            // If page 4, start countdown
-            if (index === 3) {
-                startCountdown();
-            }
-        }
+// ═══════════════════════════════════════════
+//  Animated counters
+// ═══════════════════════════════════════════
+function animateCounters() {
+  document.querySelectorAll('.stat-number').forEach(el => {
+    if (el.dataset.animated) return;
+    el.dataset.animated = 'true';
+    const target = parseInt(el.dataset.target);
+    const isDecimal = el.dataset.decimal === 'true';
+    const duration = 2000;
+    const start = performance.now();
+    function update(now) {
+      const progress = Math.min((now - start) / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3); // ease-out
+      const current = Math.floor(eased * target);
+      el.textContent = isDecimal
+        ? (current / 10).toFixed(1)
+        : current + (target >= 100 ? '万+' : '');
+      if (progress < 1) requestAnimationFrame(update);
+      else el.textContent = isDecimal ? '99.9' : target + (target >= 100 ? '万+' : '');
+    }
+    requestAnimationFrame(update);
+  });
+}
 
-        function updateNavDots() {
-            document.querySelectorAll('.nav-dots').forEach(dotGroup => {
-                const dots = dotGroup.querySelectorAll('.nav-dot');
-                dots.forEach((dot, i) => {
-                    dot.classList.toggle('active', i === currentPage);
-                });
-            });
-        }
+const statsObserver = new IntersectionObserver(entries => {
+  if (entries[0].isIntersecting) {
+    animateCounters();
+    statsObserver.disconnect();
+  }
+}, { threshold: 0.5 });
+const statsSection = document.querySelector('.stats-grid');
+if (statsSection) statsObserver.observe(statsSection);
 
-        // ===========================
-        //  爱心指数动画
-        // ===========================
-        function animateLoveMeter() {
-            const meter = document.getElementById('loveMeter');
-            const value = document.getElementById('loveMeterValue');
-            meter.style.width = '0%';
-            value.textContent = '0%';
-            setTimeout(() => {
-                meter.style.width = '99.9%';
-                // Animate number
-                let num = 0;
-                const target = 99.9;
-                const step = () => {
-                    num += Math.random() * 5 + 1;
-                    if (num >= target) {
-                        num = target;
-                        value.textContent = '♾️ 无限';
-                    } else {
-                        value.textContent = Math.floor(num) + '%';
-                        requestAnimationFrame(step);
-                    }
-                };
-                step();
-            }, 300);
-        }
+// ═══════════════════════════════════════════
+//  Parallax effect on scroll
+// ═══════════════════════════════════════════
+window.addEventListener('scroll', () => {
+  const scrolled = window.scrollY;
+  // Move orbs based on scroll
+  orbs.forEach((orb, i) => {
+    orb.cy = h * (0.3 + i * 0.15) - scrolled * (0.05 + i * 0.03);
+  });
+});
 
-        function animateReasons() {
-            const items = document.querySelectorAll('#reasonsList li');
-            items.forEach((li, i) => {
-                li.style.animation = 'none';
-                li.style.opacity = '0';
-                li.offsetHeight;
-                li.style.animation = `reasonSlide 0.5s ease-out ${i * 0.12}s forwards`;
-            });
-        }
+// ═══════════════════════════════════════════
+//  Smooth scroll for nav links
+// ═══════════════════════════════════════════
+document.querySelectorAll('a[href^="#"]').forEach(link => {
+  link.addEventListener('click', e => {
+    e.preventDefault();
+    const target = document.querySelector(link.getAttribute('href'));
+    if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+});
 
-        // ===========================
-        //  承诺清单 Check
-        // ===========================
-        function toggleCheck(el) {
-            const box = el.querySelector('.check-box');
-            box.classList.toggle('checked');
-            if (box.classList.contains('checked')) {
-                box.textContent = '✓';
-                burstHere({ clientX: window.innerWidth / 2, clientY: window.innerHeight / 2 });
-            } else {
-                box.textContent = '';
-            }
-        }
+// ═══════════════════════════════════════════
+//  Interactive AI Demo
+// ═══════════════════════════════════════════
+const demoOverlay = document.getElementById('demoOverlay');
+const demoInput = document.getElementById('demoInput');
+const demoGenerate = document.getElementById('demoGenerate');
+const demoResult = document.getElementById('demoResult');
+const demoSuggestions = document.getElementById('demoSuggestions');
+const demoClose = document.getElementById('demoClose');
+let demoMode = 'image';
 
-        function resetChecks() {
-            document.querySelectorAll('.check-box.checked').forEach(b => {
-                b.classList.remove('checked');
-                b.textContent = '';
-            });
-        }
+const suggestions = {
+  image: ['赛博朋克城市夜景', '极光下的雪山湖泊', '抽象流体艺术', '日系动漫少女', '3D玻璃材质特写', '古代宫殿水墨风', '星空下的独角兽', '蒸汽波复古风格'],
+  web: ['SaaS产品落地页', '个人博客主页', '在线商店首页', '作品集展示站', 'AI产品宣传页', '科技公司官网', '咖啡店品牌站', '健身App介绍页'],
+  design: ['科技品牌Logo', 'App图标套件', '名片设计', '海报模板', '社交媒体Banner', '品牌配色方案', '字标设计', 'UI组件库'],
+};
 
-        // ===========================
-        //  倒计时 (从"现在"开始)
-        // ===========================
-        let countdownStart = null;
-        let countdownInterval = null;
+function updateSuggestions() {
+  const list = suggestions[demoMode];
+  demoSuggestions.innerHTML = list.map(s =>
+    `<button class="demo-chip">${s}</button>`
+  ).join('');
+  demoResult.innerHTML = '<p style="color:var(--text-tertiary);">👆 输入提示词开始 AI 创作</p>';
+}
 
-        function startCountdown() {
-            if (!countdownStart) {
-                countdownStart = new Date();
-            }
-            if (countdownInterval) clearInterval(countdownInterval);
+// Tab switching
+document.getElementById('demoTabs').addEventListener('click', e => {
+  if (!e.target.classList.contains('demo-tab')) return;
+  document.querySelectorAll('.demo-tab').forEach(t => t.classList.remove('active'));
+  e.target.classList.add('active');
+  demoMode = e.target.dataset.mode;
+  updateSuggestions();
+});
 
-            function update() {
-                const now = new Date();
-                const diff = now - countdownStart;
-                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-                const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
-                const mins = Math.floor((diff / (1000 * 60)) % 60);
-                const secs = Math.floor((diff / 1000) % 60);
+// Suggestion click
+demoSuggestions.addEventListener('click', e => {
+  if (!e.target.classList.contains('demo-chip')) return;
+  demoInput.value = e.target.textContent;
+  triggerGeneration();
+});
 
-                document.getElementById('cd-days').textContent = days;
-                document.getElementById('cd-hours').textContent = String(hours).padStart(2, '0');
-                document.getElementById('cd-mins').textContent = String(mins).padStart(2, '0');
-                document.getElementById('cd-secs').textContent = String(secs).padStart(2, '0');
-            }
-            update();
-            countdownInterval = setInterval(update, 1000);
-        }
+// Generate button
+demoGenerate.addEventListener('click', triggerGeneration);
+demoInput.addEventListener('keydown', e => {
+  if (e.key === 'Enter') triggerGeneration();
+});
 
-        // ===========================
-        //  按钮逻辑
-        // ===========================
-        const btnMaybe = document.getElementById('btnMaybe');
-        let maybeClickCount = 0;
-        const maybeMessages = [
-            '再想想嘛~',
-            '真的不考虑吗？🥺',
-            '给个机会好不好？',
-            '我会对你很好的！',
-            '你忍心拒绝我吗 💔',
-        ];
+function triggerGeneration() {
+  const prompt = demoInput.value.trim();
+  if (!prompt) return;
+  showLoading();
+  setTimeout(() => {
+    if (demoMode === 'image') generateImage(prompt);
+    else if (demoMode === 'web') generateWeb(prompt);
+    else if (demoMode === 'design') generateDesign(prompt);
+  }, 2200 + Math.random() * 800);
+}
 
-        function showOverlay(emoji, title, sub) {
-            const overlay = document.getElementById('overlay');
-            const resultCard = document.getElementById('resultCard');
-            resultCard.innerHTML = `
-                <div class="result-emoji">${emoji}</div>
-                <div class="result-text">${title}</div>
-                <div class="result-sub">${sub}</div>
-                <button class="close-btn" onclick="closeOverlay()">✨ 好的 ✨</button>
-            `;
-            overlay.classList.add('show');
-        }
+function showLoading() {
+  demoResult.innerHTML = `
+    <div class="demo-loading">
+      <div class="demo-loading-bar"><div class="demo-loading-fill"></div></div>
+      <div class="demo-loading-text" id="loadingText">🤖 AI 正在理解提示词...</div>
+    </div>
+  `;
+  const texts = ['🤖 AI 正在理解提示词...', '🧠 神经网络生成中...', '🎨 正在渲染细节...', '✨ 即将完成...'];
+  let i = 0;
+  const interval = setInterval(() => {
+    i++; if (i < texts.length) {
+      const el = document.getElementById('loadingText');
+      if (el) el.textContent = texts[i];
+    } else clearInterval(interval);
+  }, 500);
+}
 
-        function closeOverlay() {
-            document.getElementById('overlay').classList.remove('show');
-        }
+// ── AI Image Generation (Canvas Art) ──
+function generateImage(prompt) {
+  const keywords = prompt.toLowerCase();
+  let palette, mood;
 
-        function sayYes() {
-            createParticles(window.innerWidth / 2, window.innerHeight / 2);
-            setTimeout(() => {
-                showOverlay(
-                    '🥰',
-                    '谢谢你答应我！',
-                    '从今天起，你就是我最重要的人 💕\n我会用尽全力去爱你、珍惜你\n每一个日出日落，都想和你一起度过 🌅\n\n—— 永远爱你的那个人'
-                );
-            }, 500);
-            setTimeout(() => createParticles(window.innerWidth * 0.3, window.innerHeight * 0.4), 800);
-            setTimeout(() => createParticles(window.innerWidth * 0.7, window.innerHeight * 0.6), 1000);
+  if (keywords.includes('赛博') || keywords.includes('cyberpunk') || keywords.includes('霓虹')) {
+    palette = ['#ff00ff','#00ffff','#7b2fff','#ff006e','#0a0a2e'];
+    mood = 'cyber';
+  } else if (keywords.includes('森林') || keywords.includes('自然') || keywords.includes('山') || keywords.includes('湖')) {
+    palette = ['#1a3a2a','#4a8c5c','#8fd19e','#2c5282','#f0e6c8'];
+    mood = 'nature';
+  } else if (keywords.includes('抽象') || keywords.includes('流体') || keywords.includes('艺术')) {
+    palette = ['#ff6b6b','#feca57','#48dbfb','#ff9ff3','#54a0ff'];
+    mood = 'abstract';
+  } else if (keywords.includes('星空') || keywords.includes('宇宙') || keywords.includes('极光')) {
+    palette = ['#0d0221','#3a1c71','#6b2fa0','#00b4d8','#90e0ef'];
+    mood = 'cosmic';
+  } else if (keywords.includes('水墨') || keywords.includes('古代') || keywords.includes('中国风')) {
+    palette = ['#1a1a1a','#3d3d3d','#8b8b8b','#c4a882','#f5e6d3'];
+    mood = 'ink';
+  } else if (keywords.includes('玻璃') || keywords.includes('3d') || keywords.includes('材质')) {
+    palette = ['#e0e7ff','#c7d2fe','#a5b4fc','#818cf8','#6366f1'];
+    mood = 'glass';
+  } else {
+    palette = ['#ff6b9d','#c44569','#6c5ce7','#00cec9','#fdcb6e'];
+    mood = 'vivid';
+  }
 
-            // Start countdown on page 4
-            countdownStart = new Date();
-            if (countdownInterval) clearInterval(countdownInterval);
-        }
+  // Build result HTML with canvas
+  demoResult.innerHTML = `
+    <canvas id="genCanvas" style="width:100%;height:400px;display:block;"></canvas>
+    <div style="position:absolute;bottom:12px;left:16px;right:16px;display:flex;justify-content:space-between;align-items:center;">
+      <span style="font-size:0.75rem;color:var(--text-tertiary);">🎨 AI 绘画 · ${prompt.slice(0,20)}…</span>
+      <span style="font-size:0.7rem;color:var(--accent-1);">4K · 5120×2880</span>
+    </div>
+  `;
 
-        function sayMaybe() {
-            maybeClickCount++;
+  const canvas = document.getElementById('genCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const dpr = window.devicePixelRatio || 1;
+  const rect = canvas.getBoundingClientRect();
+  canvas.width = rect.width * dpr;
+  canvas.height = 400 * dpr;
+  ctx.scale(dpr, dpr);
+  const W = rect.width, H = 400;
 
-            if (maybeClickCount >= maybeMessages.length) {
-                btnMaybe.textContent = '好吧，我愿意 💕';
-                btnMaybe.style.background = 'linear-gradient(135deg, #ff6090, #e91e63)';
-                btnMaybe.style.color = 'white';
-                btnMaybe.style.border = 'none';
-                btnMaybe.style.boxShadow = '0 8px 30px rgba(255, 64, 128, 0.5)';
-                btnMaybe.onclick = sayYes;
-                createParticles(window.innerWidth / 2, window.innerHeight / 2);
-                return;
-            }
+  // Background gradient
+  const bg = ctx.createLinearGradient(0,0,W,H);
+  bg.addColorStop(0, palette[0]);
+  bg.addColorStop(0.5, palette[2] || palette[0]);
+  bg.addColorStop(1, palette[4] || palette[1]);
+  ctx.fillStyle = bg; ctx.fillRect(0,0,W,H);
 
-            btnMaybe.textContent = maybeMessages[maybeClickCount];
-            createParticles(
-                btnMaybe.getBoundingClientRect().left + btnMaybe.offsetWidth / 2,
-                btnMaybe.getBoundingClientRect().top + btnMaybe.offsetHeight / 2
-            );
+  // Generate visual elements based on mood
+  if (mood === 'cyber') {
+    // Neon grid
+    ctx.strokeStyle = 'rgba(0,255,255,0.15)';
+    ctx.lineWidth = 1;
+    for (let y=0; y<H; y+=30) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
+    for (let x=0; x<W; x+=30) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
+    // Glowing orbs
+    for (let i=0; i<5; i++) {
+      const gx = W*(0.15+i*0.18), gy = H*(0.2 + Math.sin(i*1.5)*0.4);
+      const grad = ctx.createRadialGradient(gx,gy,0,gx,gy,80);
+      grad.addColorStop(0, 'rgba(255,0,255,0.5)');
+      grad.addColorStop(0.5, 'rgba(0,255,255,0.15)');
+      grad.addColorStop(1, 'transparent');
+      ctx.fillStyle = grad; ctx.beginPath(); ctx.arc(gx,gy,80,0,Math.PI*2); ctx.fill();
+    }
+    // Vertical neon lines
+    for (let i=0; i<8; i++) {
+      const lx = W*(0.1+i*0.12), lh = 80+Math.sin(i)*50;
+      ctx.strokeStyle = `rgba(${i%2?255:0},${i%2?0:255},255,${0.1+i*0.08})`;
+      ctx.lineWidth = 2+Math.random(); ctx.beginPath();
+      ctx.moveTo(lx, H); ctx.lineTo(lx, H-lh); ctx.stroke();
+    }
+  } else if (mood === 'nature') {
+    // Mountains
+    for (let m=0; m<3; m++) {
+      ctx.beginPath(); ctx.moveTo(0,H);
+      const mx = W*(0.3+m*0.25), mh = H*(0.4+m*0.2);
+      ctx.quadraticCurveTo(mx, H-mh, mx+200, H);
+      ctx.fillStyle = `rgba(${20+m*30},${60+m*40},${30+m*30},0.6)`; ctx.fill();
+    }
+    // Floating particles (fireflies)
+    for (let i=0; i<40; i++) {
+      const px = Math.random()*W, py = Math.random()*H*0.7;
+      ctx.beginPath(); ctx.arc(px,py,1.5,0,Math.PI*2);
+      ctx.fillStyle = `rgba(200,230,150,${0.3+Math.random()*0.5})`; ctx.fill();
+      // Glow
+      const fg = ctx.createRadialGradient(px,py,0,px,py,8);
+      fg.addColorStop(0,'rgba(200,230,150,0.6)'); fg.addColorStop(1,'transparent');
+      ctx.fillStyle = fg; ctx.beginPath(); ctx.arc(px,py,8,0,Math.PI*2); ctx.fill();
+    }
+  } else if (mood === 'abstract') {
+    // Flow fields
+    for (let i=0; i<12; i++) {
+      ctx.beginPath();
+      const sx = W*(0.05+Math.random()*0.9), sy = H*(0.1+Math.random()*0.8);
+      ctx.moveTo(sx,sy);
+      for (let j=0; j<5; j++) {
+        const cx = sx + (Math.random()-0.5)*W*0.5;
+        const cy = sy + (Math.random()-0.5)*H*0.5;
+        ctx.quadraticCurveTo(cx,cy, cx+(Math.random()-0.5)*W*0.3, cy+(Math.random()-0.5)*H*0.3);
+      }
+      ctx.strokeStyle = `rgba(${255*Math.random()},${255*Math.random()},255,0.3)`;
+      ctx.lineWidth = 2+Math.random()*4; ctx.stroke();
+    }
+    // Blur circles
+    for (let i=0; i<6; i++) {
+      const cx = W*(0.1+Math.random()*0.8), cy = H*(0.2+Math.random()*0.6);
+      const rg = ctx.createRadialGradient(cx,cy,0,cx,cy,100);
+      rg.addColorStop(0, `rgba(${[palette[3]]},0.25)`); rg.addColorStop(1,'transparent');
+      ctx.fillStyle = rg; ctx.beginPath(); ctx.arc(cx,cy,100,0,Math.PI*2); ctx.fill();
+    }
+  } else if (mood === 'cosmic') {
+    // Stars
+    for (let i=0; i<200; i++) {
+      const sx = Math.random()*W, sy = Math.random()*H*0.7;
+      ctx.beginPath(); ctx.arc(sx,sy,Math.random()*1.5,0,Math.PI*2);
+      ctx.fillStyle = `rgba(255,255,255,${0.3+Math.random()*0.7})`; ctx.fill();
+    }
+    // Nebula clouds
+    for (let i=0; i<4; i++) {
+      const nx = W*(0.15+i*0.22), ny = H*(0.2+Math.sin(i*1.7)*0.3);
+      const ng = ctx.createRadialGradient(nx,ny,0,nx,ny,150);
+      const colors = ['rgba(180,130,255,0.12)','rgba(0,180,255,0.1)','rgba(255,100,200,0.08)','rgba(100,200,255,0.1)'];
+      ng.addColorStop(0, colors[i]); ng.addColorStop(1,'transparent');
+      ctx.fillStyle = ng; ctx.beginPath(); ctx.arc(nx,ny,150,0,Math.PI*2); ctx.fill();
+    }
+    // Aurora wave
+    ctx.beginPath();
+    for (let x=0; x<W; x+=2) {
+      const y = H*0.15 + Math.sin(x*0.008)*30 + Math.sin(x*0.015)*20;
+      if (x===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+    }
+    ctx.strokeStyle = 'rgba(0,255,200,0.6)'; ctx.lineWidth = 8; ctx.stroke();
+    ctx.strokeStyle = 'rgba(100,200,255,0.4)'; ctx.lineWidth = 15; ctx.stroke();
+  } else {
+    // Vivid / glass / ink - flowing orbs
+    for (let i=0; i<10; i++) {
+      const ox = W*(0.1+Math.random()*0.8), oy = H*(0.1+Math.random()*0.8);
+      const og = ctx.createRadialGradient(ox,oy,0,ox,oy,60+Math.random()*60);
+      og.addColorStop(0, palette[i%palette.length].replace(')','').replace('rgb(','rgba(')+',0.4)');
+      og.addColorStop(1,'transparent');
+      ctx.fillStyle = og; ctx.beginPath(); ctx.arc(ox,oy,80,0,Math.PI*2); ctx.fill();
+    }
+    // Fine particles
+    for (let i=0; i<60; i++) {
+      ctx.beginPath(); ctx.arc(Math.random()*W,Math.random()*H,1,0,Math.PI*2);
+      ctx.fillStyle = `rgba(255,255,255,${0.2+Math.random()*0.4})`; ctx.fill();
+    }
+  }
 
-            if (maybeClickCount >= 2) {
-                const maxX = Math.max(10, window.innerWidth - btnMaybe.offsetWidth - 20);
-                const maxY = Math.max(10, window.innerHeight - btnMaybe.offsetHeight - 20);
-                btnMaybe.style.position = 'fixed';
-                btnMaybe.style.left = Math.random() * maxX + 'px';
-                btnMaybe.style.top = Math.random() * maxY + 'px';
-                btnMaybe.style.zIndex = '550';
-                btnMaybe.style.transition = 'all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
-            }
-        }
+  // Watermark
+  ctx.fillStyle = 'rgba(255,255,255,0.15)'; ctx.font = '12px Inter,sans-serif';
+  ctx.fillText('Generated by NexusAI', 16, H-16);
+}
 
-        // ===========================
-        //  背景音乐（需要用户提供音频文件）
-        // ===========================
-        const bgMusic = document.getElementById('bgMusic');
-        let musicPlaying = false;
+// ── AI Website Generation ──
+function generateWeb(prompt) {
+  const kw = prompt.toLowerCase();
+  let theme = 'light';
+  if (kw.includes('科技')||kw.includes('saas')||kw.includes('暗')||kw.includes('黑')) theme = 'dark';
+  const isDark = theme === 'dark';
+  const bg = isDark ? '#0a0a1a' : '#f8fafc';
+  const cardBg = isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.02)';
+  const text = isDark ? '#e2e8f0' : '#1e293b';
+  const accent = isDark ? '#818cf8' : '#6366f1';
+  const border = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)';
 
-        function toggleMusic() {
-            // 由于没有实际音频文件，这里做视觉反馈
-            const hint = document.querySelector('.music-hint');
-            if (musicPlaying) {
-                hint.textContent = '🎵 点击播放音乐';
-                hint.style.color = 'rgba(255,255,255,0.4)';
-                musicPlaying = false;
-                bgMusic.pause();
-            } else {
-                hint.textContent = '🎶 音乐播放中...';
-                hint.style.color = '#ff8db5';
-                musicPlaying = true;
-                bgMusic.play().catch(() => {
-                    // 没有音频源时会失败，静默处理
-                    hint.textContent = '📁 请添加音乐文件';
-                    hint.style.color = 'rgba(255,255,255,0.5)';
-                });
-            }
-        }
+  // Generate dynamic content from prompt
+  const heroTitle = prompt.length > 15 ? prompt : (prompt + ' · AI驱动');
+  const features = ['智能引擎', '极速渲染', '云端协作', '数据洞察'].slice(0,3+Math.floor(Math.random()*2));
 
-        // ===========================
-        //  键盘 & 全局事件
-        // ===========================
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') closeOverlay();
-            if (e.key === 'ArrowRight') goToPage((currentPage + 1) % totalPages);
-            if (e.key === 'ArrowLeft') goToPage((currentPage - 1 + totalPages) % totalPages);
-        });
+  demoResult.innerHTML = `
+    <div class="demo-web-frame" style="background:${bg};color:${text};" id="webFrame">
+      <div class="demo-web-header" style="border-color:${border};">
+        <div class="demo-web-dot" style="background:#ff5f57;"></div>
+        <div class="demo-web-dot" style="background:#febc2e;"></div>
+        <div class="demo-web-dot" style="background:#28c840;"></div>
+        <span style="font-size:0.7rem;margin-left:8px;color:#888;">${prompt.slice(0,20)}.nexus.ai</span>
+      </div>
+      <div class="demo-web-content">
+        <nav style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+          <span style="font-weight:700;font-size:1rem;color:${accent};">● ${prompt.slice(0,8)}</span>
+          <div style="display:flex;gap:12px;font-size:0.7rem;color:#888;">
+            <span>首页</span><span>产品</span><span>关于</span><span>联系</span>
+          </div>
+        </nav>
+        <div style="text-align:center;padding:30px 0;">
+          <h1 style="font-size:1.6rem;font-weight:700;margin-bottom:8px;">${heroTitle}</h1>
+          <p style="color:#888;font-size:0.8rem;">AI 驱动的智能创作平台，让创意无限延伸</p>
+          <div style="margin-top:16px;display:flex;gap:8px;justify-content:center;">
+            <span style="padding:8px 20px;background:${accent};color:#fff;border-radius:50px;font-size:0.75rem;font-weight:600;">立即体验</span>
+            <span style="padding:8px 20px;border:1px solid ${border};border-radius:50px;font-size:0.75rem;">了解更多</span>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(${Math.min(features.length,3)},1fr);gap:8px;margin-top:16px;">
+          ${features.map(f => `
+            <div style="padding:16px;background:${cardBg};border:1px solid ${border};border-radius:12px;text-align:center;">
+              <div style="font-size:1.2rem;margin-bottom:4px;">✨</div>
+              <div style="font-weight:600;font-size:0.8rem;">${f}</div>
+              <div style="color:#888;font-size:0.65rem;margin-top:2px;">AI 自动优化</div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    </div>
+    <div style="position:absolute;bottom:12px;left:16px;right:16px;display:flex;justify-content:space-between;align-items:center;pointer-events:none;">
+      <span style="font-size:0.75rem;color:var(--text-tertiary);">🖥️ AI 网页生成 · React + Tailwind</span>
+      <span style="font-size:0.7rem;color:#28c840;">● 可部署</span>
+    </div>
+  `;
+}
 
-        document.getElementById('overlay').addEventListener('click', function(e) {
-            if (e.target === this) closeOverlay();
-        });
+// ── AI Design Generation ──
+function generateDesign(prompt) {
+  const kw = prompt.toLowerCase();
+  let designPalette;
+  if (kw.includes('科技')||kw.includes('logo')||kw.includes('品牌')) {
+    designPalette = ['#6366f1','#818cf8','#22d3ee','#f0f0f5','#0a0a1a'];
+  } else if (kw.includes('咖啡')||kw.includes('温暖')) {
+    designPalette = ['#6f4e37','#d4a574','#f5e6d3','#2c1810','#fff8f0'];
+  } else if (kw.includes('健身')||kw.includes('运动')) {
+    designPalette = ['#ff4757','#ff6b81','#2ed573','#ffffff','#1e1e2e'];
+  } else {
+    designPalette = ['#a78bfa','#f472b6','#34d399','#fbbf24','#1a1a2e'];
+  }
 
-        // Touch swipe for mobile
-        let touchStartX = 0;
-        document.addEventListener('touchstart', (e) => {
-            touchStartX = e.touches[0].clientX;
-        });
-        document.addEventListener('touchend', (e) => {
-            const diff = e.changedTouches[0].clientX - touchStartX;
-            if (Math.abs(diff) > 60) {
-                if (diff < 0) goToPage((currentPage + 1) % totalPages);
-                else goToPage((currentPage - 1 + totalPages) % totalPages);
-            }
-        });
+  const shapes = ['circle','rounded','square','hexagon'];
+  const shape = shapes[Math.floor(Math.random()*shapes.length)];
+  let logoShape;
+  if (shape === 'circle') logoShape = 'border-radius:50%;';
+  else if (shape === 'rounded') logoShape = 'border-radius:16px;';
+  else if (shape === 'hexagon') logoShape = 'border-radius:8px;clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%);';
+  else logoShape = 'border-radius:4px;';
 
-        // ===========================
-        //  初始化
-        // ===========================
-        console.log('%c💖  hi~ 看到控制台的人，一定是很特别的人吧 %c🌸',
-            'font-size:18px;color:#ff6090;', 'font-size:14px;');
-        console.log('%c这个网页是我用心写的，希望你喜欢 ❤️', 'color:#ff8db5;font-size:13px;');
+  demoResult.innerHTML = `
+    <div class="demo-result-preview">
+      <!-- Logo -->
+      <div style="display:flex;align-items:center;gap:16px;margin-bottom:24px;width:100%;">
+        <div style="width:72px;height:72px;${logoShape}background:linear-gradient(135deg,${designPalette[0]},${designPalette[1]});display:flex;align-items:center;justify-content:center;font-size:1.8rem;">✦</div>
+        <div>
+          <div style="font-weight:700;font-size:1.2rem;">${prompt.slice(0,12)}</div>
+          <div style="color:var(--text-tertiary);font-size:0.75rem;">品牌标识 · AI 生成</div>
+        </div>
+      </div>
+      <!-- Color palette -->
+      <div style="width:100%;">
+        <div style="font-size:0.7rem;color:var(--text-tertiary);margin-bottom:8px;">🎨 配色方案</div>
+        <div style="display:flex;gap:6px;margin-bottom:20px;">
+          ${designPalette.map(c => `
+            <div style="width:40px;height:40px;border-radius:10px;background:${c};border:1px solid rgba(255,255,255,0.1);flex:1;" title="${c}"></div>
+          `).join('')}
+        </div>
+      </div>
+      <!-- Typography -->
+      <div style="width:100%;margin-bottom:16px;">
+        <div style="font-size:0.7rem;color:var(--text-tertiary);margin-bottom:8px;">🔤 字体方案</div>
+        <div style="font-size:1.6rem;font-weight:700;margin-bottom:4px;">Heading Display</div>
+        <div style="font-size:1rem;color:var(--text-secondary);margin-bottom:8px;">Body Text · 正文内容展示</div>
+        <div style="font-size:0.7rem;color:var(--text-tertiary);">CAPTION · 辅助文字</div>
+      </div>
+      <!-- Preview mockup -->
+      <div style="width:100%;padding:20px;background:${designPalette[4]};border-radius:16px;border:1px solid rgba(255,255,255,0.06);">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+          <div style="width:32px;height:32px;${logoShape}background:linear-gradient(135deg,${designPalette[0]},${designPalette[1]});display:flex;align-items:center;justify-content:center;font-size:0.7rem;transform:scale(0.6);">✦</div>
+          <div style="font-weight:600;font-size:0.8rem;color:${designPalette[3]};">${prompt.slice(0,10)}</div>
+        </div>
+        <div style="display:flex;gap:6px;">
+          <div style="flex:1;padding:12px;background:${designPalette[0]};border-radius:10px;text-align:center;color:#fff;font-size:0.7rem;font-weight:600;">主按钮</div>
+          <div style="flex:1;padding:12px;background:transparent;border:1px solid ${designPalette[2]};border-radius:10px;text-align:center;color:${designPalette[2]};font-size:0.7rem;">次按钮</div>
+        </div>
+      </div>
+    </div>
+    <div style="position:absolute;bottom:12px;left:16px;right:16px;display:flex;justify-content:space-between;align-items:center;pointer-events:none;">
+      <span style="font-size:0.75rem;color:var(--text-tertiary);">✨ AI 设计 · 品牌系统</span>
+      <span style="font-size:0.7rem;color:var(--accent-3);">源文件可导出</span>
+    </div>
+  `;
+}
 
-        // Background image config - uncomment and set your image:
-        // document.getElementById('bgImage').style.backgroundImage = "url('your-anime-photo.jpg')";
-    </script>
+// ── Modal Controls ──
+function openDemo(mode = 'image') {
+  demoMode = mode;
+  document.querySelectorAll('.demo-tab').forEach(t => {
+    t.classList.toggle('active', t.dataset.mode === mode);
+  });
+  updateSuggestions();
+  demoInput.value = '';
+  demoResult.innerHTML = '<p style="color:var(--text-tertiary);">👆 输入提示词开始 AI 创作</p>';
+  demoOverlay.classList.add('open');
+  document.body.style.overflow = 'hidden';
+  setTimeout(() => demoInput.focus(), 300);
+}
+
+function closeDemo() {
+  demoOverlay.classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+demoClose.addEventListener('click', closeDemo);
+demoOverlay.addEventListener('click', e => {
+  if (e.target === demoOverlay) closeDemo();
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && demoOverlay.classList.contains('open')) closeDemo();
+});
+
+// Hook up CTA buttons
+document.getElementById('btnTry').addEventListener('click', e => { e.preventDefault(); openDemo('image'); });
+document.getElementById('btnDemo').addEventListener('click', e => { e.preventDefault(); openDemo('web'); });
+</script>
 </body>
 </html>
