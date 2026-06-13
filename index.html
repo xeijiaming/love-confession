@@ -1631,27 +1631,42 @@ const chatSend = document.getElementById('chatSend');
 const chatMessages = document.getElementById('chatMessages');
 
 const chatReplies = [
-  { kw: ['hello','hi','你好','嗨','在吗'], reply: 'Hello! I am NexusAI assistant. I can help with creative ideas, prompt optimization, or any questions about AI creation. Feel free to ask!' },
-  { kw: ['画','image','picture','generate','生成','创作','图'], reply: 'For AI painting, try describing your vision in detail — including subject, style, lighting, and mood. The more specific, the better the result. Try "Generate" in the demo panel!' },
-  { kw: ['web','网页','site','网站','页面'], reply: 'Our AI can generate full landing pages! Describe your site in the demo panel, and it will create a complete preview with navigation, hero section, and feature cards.' },
-  { kw: ['design','设计','logo','brand','品牌'], reply: 'AI Design mode generates complete brand systems — logos, color palettes, typography, and UI component previews. All in one click.' },
-  { kw: ['prompt','提示词','提示','优化'], reply: 'A good prompt = subject + style + details + mood. Example: "A futuristic city at sunset, cyberpunk style, neon lights reflecting off glass buildings, cinematic lighting, 8K." Try it!' },
-  { kw: ['thanks','谢谢','感谢','thx','棒'], reply: 'Happy to help! Keep creating with NexusAI!' },
-  { kw: ['price','价格','收费','free','免费'], reply: 'NexusAI is currently in free beta. All features — AI painting, web generation, and design — are available at no cost.' },
+  { kw: ['hello','hi','hey'], reply: 'Hey! I am NexusAI assistant. How can I help with your creative project today?' },
+  { kw: ['你好','嗨','在吗','嗨喽'], reply: '你好！我是 NexusAI 创意助手，可以帮你优化提示词、解答 AI 创作问题、或者聊聊你的创意想法～' },
+  { kw: ['画','image','picture','generate','生成','创作','图','绘画'], reply: '打开 Demo 面板的「AI 绘画」模式，输入你想要的画面描述——主体、风格、光线、氛围越详细，生成效果越好。试试看吧！' },
+  { kw: ['web','网页','site','网站','页面','落地页'], reply: '在 Demo 面板选「AI 网页」模式，输入网站描述就能生成完整预览，包含导航、Hero 区域和功能卡片。' },
+  { kw: ['design','设计','logo','brand','品牌','标志'], reply: 'AI 设计模式可以一键生成完整品牌系统——Logo、配色方案、字体层级和 UI 组件预览。' },
+  { kw: ['prompt','提示词','提示','优化','怎么写'], reply: '好提示词 = 主体 + 风格 + 细节 + 氛围。比如：「夕阳下的赛博朋克城市，霓虹灯光映在玻璃大楼上，电影级光影，8K超清」。试试这个模板！' },
+  { kw: ['thanks','谢谢','感谢','thx','棒','厉害'], reply: '不客气！继续用 NexusAI 创作吧 🚀' },
+  { kw: ['price','价格','收费','free','免费','钱'], reply: 'NexusAI 目前完全免费公测，所有功能——AI 绘画、网页生成、品牌设计——都不收费。' },
+  { kw: ['风格','style','有哪些'], reply: '支持 6 种风格：自动（智能匹配）、写实、动漫、油画、水彩、像素。在 AI 绘画模式下可以切换！' },
+  { kw: ['你是谁','你是什么','你的名字','叫什么'], reply: '我是 NexusAI 的内置创意助手，专门帮你更好地使用这个 AI 创作平台。我懂中英文，随便聊～' },
 ];
+
+function isChinese(text) {
+  return /[一-鿿]/.test(text);
+}
 
 function getChatReply(msg) {
   const lower = msg.toLowerCase();
   for (let r of chatReplies) {
     if (r.kw.some(k => lower.includes(k))) return r.reply;
   }
-  const fallbacks = [
-    'Interesting! Tell me more about what kind of creation you have in mind.',
-    'I recommend trying the AI painting demo with a detailed prompt — you might be surprised by the results!',
-    'That sounds creative! Have you tried our live preview feature? It auto-generates as you type.',
-    'Good question! Our AI engine supports multiple styles — realistic, anime, oil painting, watercolor, and pixel art.',
+  const cnFallbacks = [
+    '有意思！可以说说你具体想创作什么吗？',
+    '建议试试 AI 绘画 Demo，输入一个详细的提示词，效果会很惊艳！',
+    '好想法！你试过实时预览功能吗？输入 3 个字就会自动生成。',
+    '这个方向很棒！要不要在 Demo 面板里试一下？选一个风格效果更佳。',
+    'NexusAI 支持写实、动漫、油画、水彩、像素等多种风格，你喜欢哪种？',
   ];
-  return fallbacks[Math.floor(Math.random() * fallbacks.length)];
+  const enFallbacks = [
+    'Interesting! Tell me more about what kind of creation you have in mind.',
+    'Try the AI painting demo with a detailed prompt — you might be surprised!',
+    'That sounds creative! Have you tried the live preview feature yet?',
+    'Good question! Our AI engine supports realistic, anime, oil, watercolor, and pixel art styles.',
+  ];
+  const pool = isChinese(msg) ? cnFallbacks : enFallbacks;
+  return pool[Math.floor(Math.random() * pool.length)];
 }
 
 function addChatMessage(text, role) {
