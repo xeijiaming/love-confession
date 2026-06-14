@@ -680,7 +680,7 @@ body {
       全新多模态引擎，为每一个想法赋予生命。
     </p>
     <div class="hero-actions">
-      <a href="#" class="btn btn-primary btn-float" id="btnTry">✨ 立即体验</a>
+      <a href="#" class="btn btn-primary btn-float" id="btnTry">💬 AI 对话</a>
       <a href="#" class="btn btn-secondary btn-float" id="btnDemo">▶ 查看演示</a>
     </div>
   </div>
@@ -1617,7 +1617,12 @@ document.addEventListener('keydown', e => {
 });
 
 // Hook up CTA buttons
-document.getElementById('btnTry').addEventListener('click', e => { e.preventDefault(); openDemo('image'); });
+document.getElementById('btnTry').addEventListener('click', e => {
+  e.preventDefault();
+  chatPanel.classList.add('open');
+  chatFab.style.opacity = '0';
+  setTimeout(function() { chatInput.focus(); }, 300);
+});
 document.getElementById('btnDemo').addEventListener('click', e => { e.preventDefault(); openDemo('web'); });
 
 // ═══════════════════════════════════════════
