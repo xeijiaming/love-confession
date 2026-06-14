@@ -571,19 +571,49 @@ body {
   100% { transform: scale(1); opacity: 0; }
 }
 
+/* ── Chat Backdrop ── */
+.chat-backdrop {
+  position: fixed; inset: 0; z-index: 148;
+  background: rgba(0,0,0,0);
+  pointer-events: none;
+  transition: background 0.5s cubic-bezier(0.22,1,0.36,1);
+}
+.chat-backdrop.open {
+  background: rgba(0,0,0,0.55);
+  pointer-events: auto;
+}
+
 /* ── Chat Panel ── */
 .chat-panel {
-  position: fixed; bottom: 96px; right: 28px; z-index: 150;
-  width: 380px; max-width: calc(100vw - 40px); height: 500px; max-height: 60vh;
-  border-radius: var(--radius-md);
+  position: fixed; z-index: 150;
+  bottom: 28px; right: 28px;
+  width: 54px; height: 54px;
+  border-radius: 50%;
   background: linear-gradient(160deg, rgba(18,18,35,0.98), rgba(10,10,22,0.99));
   border: 1px solid var(--glass-border);
   box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 40px rgba(99,102,241,0.1);
   display: flex; flex-direction: column; overflow: hidden;
-  transform: translateY(16px) scale(0.95); opacity: 0; pointer-events: none;
-  transition: var(--transition-spring);
+  pointer-events: none;
+  transition:
+    width 0.55s cubic-bezier(0.22,1,0.36,1),
+    height 0.55s cubic-bezier(0.22,1,0.36,1),
+    bottom 0.55s cubic-bezier(0.22,1,0.36,1),
+    right 0.55s cubic-bezier(0.22,1,0.36,1),
+    border-radius 0.5s cubic-bezier(0.22,1,0.36,1),
+    opacity 0.35s cubic-bezier(0.22,1,0.36,1),
+    transform 0.55s cubic-bezier(0.22,1,0.36,1);
+  opacity: 0;
+  transform: scale(0.4);
 }
-.chat-panel.open { transform: translateY(0) scale(1); opacity: 1; pointer-events: auto; }
+.chat-panel.open {
+  width: min(680px, calc(100vw - 40px));
+  height: min(560px, 75vh);
+  bottom: 50%; right: 50%;
+  border-radius: var(--radius-lg);
+  opacity: 1;
+  pointer-events: auto;
+  transform: translate(50%, 50%) scale(1);
+}
 .chat-header {
   display: flex; align-items: center; justify-content: space-between;
   padding: 14px 18px; border-bottom: 1px solid var(--glass-border);
@@ -647,7 +677,7 @@ body {
   .demo-prompt-wrap { flex-direction: column; }
   .demo-body { padding: 16px; }
   .demo-tabs { padding: 0 12px; overflow-x: auto; }
-  .chat-panel { right: 8px; width: calc(100vw - 16px); }
+  .chat-panel.open { width: calc(100vw - 16px); height: 65vh; }
 }
 </style>
 </head>
@@ -874,6 +904,9 @@ body {
     </div>
   </div>
 </div>
+
+<!-- Chat Backdrop -->
+<div class="chat-backdrop" id="chatBackdrop"></div>
 
 <!-- Chat FAB -->
 <button class="chat-fab" id="chatFab" title="AI 助手">
@@ -1613,15 +1646,16 @@ demoOverlay.addEventListener('click', e => {
   if (e.target === demoOverlay) closeDemo();
 });
 document.addEventListener('keydown', e => {
-  if (e.key === 'Escape' && demoOverlay.classList.contains('open')) closeDemo();
+  if (e.key === 'Escape') {
+    if (demoOverlay.classList.contains('open')) closeDemo();
+    else if (chatPanel.classList.contains('open')) closeChat();
+  }
 });
 
 // Hook up CTA buttons
 document.getElementById('btnTry').addEventListener('click', e => {
   e.preventDefault();
-  chatPanel.classList.add('open');
-  chatFab.style.opacity = '0';
-  setTimeout(function() { chatInput.focus(); }, 300);
+  openChat();
 });
 document.getElementById('btnDemo').addEventListener('click', e => { e.preventDefault(); openDemo('web'); });
 
@@ -1731,16 +1765,30 @@ chatInput.addEventListener('keydown', function(e) {
   if (e.key === 'Enter') sendChat();
 });
 
+var chatBackdrop = document.getElementById('chatBackdrop');
+
+function openChat() {
+  chatPanel.classList.add('open');
+  chatBackdrop.classList.add('open');
+  chatFab.style.opacity = '0';
+  chatFab.style.pointerEvents = 'none';
+  setTimeout(function() { chatInput.focus(); }, 600);
+}
+
+function closeChat() {
+  chatPanel.classList.remove('open');
+  chatBackdrop.classList.remove('open');
+  chatFab.style.opacity = '1';
+  chatFab.style.pointerEvents = 'auto';
+}
+
 chatFab.addEventListener('click', function() {
-  var open = chatPanel.classList.toggle('open');
-  chatFab.style.opacity = open ? '0' : '1';
-  if (open) setTimeout(function() { chatInput.focus(); }, 300);
+  if (chatPanel.classList.contains('open')) closeChat();
+  else openChat();
 });
 
-chatClose.addEventListener('click', function() {
-  chatPanel.classList.remove('open');
-  chatFab.style.opacity = '1';
-});
+chatClose.addEventListener('click', closeChat);
+chatBackdrop.addEventListener('click', closeChat);
 </script>
 </body>
 </html>
