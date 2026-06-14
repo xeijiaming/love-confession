@@ -883,11 +883,8 @@ body {
 <!-- Chat Panel -->
 <div class="chat-panel" id="chatPanel">
   <div class="chat-header">
-    <span class="chat-header-title">🤖 NexusAI 助手</span>
-    <div style="display:flex;align-items:center;gap:8px;">
-      <input class="api-key-input" id="apiKeyInput" placeholder="🔑 智谱 Key" style="width:120px;padding:4px 8px;border-radius:8px;border:1px solid var(--glass-border);background:var(--glass);color:var(--text-primary);font-size:0.7rem;outline:none;" />
-      <button class="chat-header-close" id="chatClose">✕</button>
-    </div>
+    <span class="chat-header-title">🤖 NexusAI 助手 · 智谱AI</span>
+    <button class="chat-header-close" id="chatClose">✕</button>
   </div>
   <div class="chat-messages" id="chatMessages">
     <div class="chat-msg ai">你好！我是 NexusAI 创意助手。可以帮你优化提示词、解答问题、或者聊聊你的创意想法 ✨</div>
@@ -1632,15 +1629,8 @@ const chatClose = document.getElementById('chatClose');
 const chatInput = document.getElementById('chatInput');
 const chatSend = document.getElementById('chatSend');
 const chatMessages = document.getElementById('chatMessages');
-const apiKeyInput = document.getElementById('apiKeyInput');
 
-let apiKey = localStorage.getItem('nexusai_zhipu_key') || '';
-if (apiKey && apiKeyInput) apiKeyInput.value = apiKey;
-if (apiKeyInput) apiKeyInput.addEventListener('input', function() {
-  apiKey = this.value.trim();
-  if (apiKey) localStorage.setItem('nexusai_zhipu_key', apiKey);
-  else localStorage.removeItem('nexusai_zhipu_key');
-});
+const apiKey = 'f702d1279421494c975bc2e1f084398e.VeMBawwY5M23rQQw';
 
 let conversationHistory = [];
 
@@ -1716,29 +1706,19 @@ function sendChat() {
   chatInput.value = '';
   showTyping();
 
-  if (apiKey) {
-    conversationHistory.push({ role: 'user', content: msg });
-    if (conversationHistory.length > 10) conversationHistory = conversationHistory.slice(-10);
-    var systemMsg = { role: 'system', content: '你是 NexusAI 创意助手。用与用户相同的语言回复。帮助用户进行AI绘画、网页生成、品牌设计等创意工作。保持热情、有洞察力。回复控制在200字以内。' };
-    callDeepSeek([systemMsg].concat(conversationHistory)).then(function(reply) {
-      conversationHistory.push({ role: 'assistant', content: reply });
-      hideTyping();
-      addChatMsg(reply, 'ai');
-    }).catch(function(e) {
-      hideTyping();
-      console.error('API error:', e);
-      addChatMsg('智谱AI API 调用失败: ' + e.message, 'ai');
-      addChatMsg(getReply(msg), 'ai');
-      apiKey = '';
-      if (apiKeyInput) apiKeyInput.value = '';
-      localStorage.removeItem('nexusai_zhipu_key');
-    });
-  } else {
-    setTimeout(function() {
-      hideTyping();
-      addChatMsg(getReply(msg), 'ai');
-    }, 600 + Math.random() * 800);
-  }
+  conversationHistory.push({ role: 'user', content: msg });
+  if (conversationHistory.length > 10) conversationHistory = conversationHistory.slice(-10);
+  var systemMsg = { role: 'system', content: '你是 NexusAI 创意助手。用与用户相同的语言回复。帮助用户进行AI绘画、网页生成、品牌设计等创意工作。保持热情、有洞察力。回复控制在200字以内。' };
+  callDeepSeek([systemMsg].concat(conversationHistory)).then(function(reply) {
+    conversationHistory.push({ role: 'assistant', content: reply });
+    hideTyping();
+    addChatMsg(reply, 'ai');
+  }).catch(function(e) {
+    hideTyping();
+    console.error('API error:', e);
+    addChatMsg('智谱AI 暂时不可用: ' + e.message, 'ai');
+    addChatMsg(getReply(msg), 'ai');
+  });
 }
 
 chatSend.addEventListener('click', sendChat);
