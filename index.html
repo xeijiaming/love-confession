@@ -694,7 +694,7 @@ body {
     <a href="#capabilities">能力</a>
     <a href="#cases">案例</a>
     <a href="#stats">数据</a>
-    <a href="#" class="nav-cta">开始使用</a>
+    <a href="#" class="nav-cta" id="navCta">开始使用</a>
   </div>
 </nav>
 
@@ -916,11 +916,11 @@ body {
 <!-- Chat Panel -->
 <div class="chat-panel" id="chatPanel">
   <div class="chat-header">
-    <span class="chat-header-title">🤖 NexusAI 助手 · 智谱AI</span>
+    <span class="chat-header-title">🤖 小銘助手</span>
     <button class="chat-header-close" id="chatClose">✕</button>
   </div>
   <div class="chat-messages" id="chatMessages">
-    <div class="chat-msg ai">你好！我是 NexusAI 创意助手。可以帮你优化提示词、解答问题、或者聊聊你的创意想法 ✨</div>
+    <div class="chat-msg ai">你好！我是 小銘助手。可以帮你优化提示词、解答问题、或者聊聊你的创意想法 ✨</div>
   </div>
   <div class="chat-input-wrap">
     <input class="chat-input" id="chatInput" placeholder="输入消息…" />
@@ -1657,6 +1657,10 @@ document.getElementById('btnTry').addEventListener('click', e => {
   e.preventDefault();
   openChat();
 });
+document.getElementById('navCta').addEventListener('click', e => {
+  e.preventDefault();
+  openChat();
+});
 document.getElementById('btnDemo').addEventListener('click', e => { e.preventDefault(); openDemo('web'); });
 
 // ═══════════════════════════════════════════
@@ -1703,7 +1707,7 @@ function getReply(msg) {
   var lower = msg.toLowerCase();
   var replies = [
     { kw: ['hello','hi','hey'], r: 'Hey! I am NexusAI assistant. How can I help?' },
-    { kw: ['你好','嗨','在吗'], r: '你好！我是 NexusAI 创意助手，可以帮你优化提示词、解答 AI 创作问题～' },
+    { kw: ['你好','嗨','在吗'], r: '你好！我是 小銘助手，可以帮你优化提示词、解答 AI 创作问题～' },
     { kw: ['画','image','生成','创作','图','绘画'], r: '打开 Demo 面板的「AI 绘画」模式，输入画面描述即可生成！主体、风格、光线、氛围越详细，效果越好。' },
     { kw: ['web','网页','网站','页面','落地页'], r: '在 Demo 面板选「AI 网页」模式，输入网站描述就能生成完整预览。' },
     { kw: ['design','设计','logo','brand','品牌','标志'], r: 'AI 设计模式可以一键生成完整品牌系统——Logo、配色、字体、UI 组件。' },
@@ -1747,7 +1751,7 @@ function sendChat() {
 
   conversationHistory.push({ role: 'user', content: msg });
   if (conversationHistory.length > 10) conversationHistory = conversationHistory.slice(-10);
-  var systemMsg = { role: 'system', content: '你是 NexusAI 创意助手。用与用户相同的语言回复。帮助用户进行AI绘画、网页生成、品牌设计等创意工作。保持热情、有洞察力。回复控制在200字以内。' };
+  var systemMsg = { role: 'system', content: '你是 小銘助手。用与用户相同的语言回复。帮助用户进行AI绘画、网页生成、品牌设计等创意工作。保持热情、有洞察力。回复控制在200字以内。' };
   callDeepSeek([systemMsg].concat(conversationHistory)).then(function(reply) {
     conversationHistory.push({ role: 'assistant', content: reply });
     hideTyping();
