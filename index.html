@@ -885,7 +885,7 @@ body {
   <div class="chat-header">
     <span class="chat-header-title">🤖 NexusAI 助手</span>
     <div style="display:flex;align-items:center;gap:8px;">
-      <input class="api-key-input" id="apiKeyInput" placeholder="🔑 API Key" style="width:120px;padding:4px 8px;border-radius:8px;border:1px solid var(--glass-border);background:var(--glass);color:var(--text-primary);font-size:0.7rem;outline:none;" />
+      <input class="api-key-input" id="apiKeyInput" placeholder="🔑 智谱 Key" style="width:120px;padding:4px 8px;border-radius:8px;border:1px solid var(--glass-border);background:var(--glass);color:var(--text-primary);font-size:0.7rem;outline:none;" />
       <button class="chat-header-close" id="chatClose">✕</button>
     </div>
   </div>
@@ -1634,12 +1634,12 @@ const chatSend = document.getElementById('chatSend');
 const chatMessages = document.getElementById('chatMessages');
 const apiKeyInput = document.getElementById('apiKeyInput');
 
-let apiKey = localStorage.getItem('nexusai_deepseek_key') || '';
+let apiKey = localStorage.getItem('nexusai_zhipu_key') || '';
 if (apiKey && apiKeyInput) apiKeyInput.value = apiKey;
 if (apiKeyInput) apiKeyInput.addEventListener('input', function() {
   apiKey = this.value.trim();
-  if (apiKey) localStorage.setItem('nexusai_deepseek_key', apiKey);
-  else localStorage.removeItem('nexusai_deepseek_key');
+  if (apiKey) localStorage.setItem('nexusai_zhipu_key', apiKey);
+  else localStorage.removeItem('nexusai_zhipu_key');
 });
 
 let conversationHistory = [];
@@ -1696,10 +1696,10 @@ function getReply(msg) {
 }
 
 async function callDeepSeek(messages) {
-  var resp = await fetch('https://api.deepseek.com/chat/completions', {
+  var resp = await fetch('https://open.bigmodel.cn/api/paas/v4/chat/completions', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + apiKey },
-    body: JSON.stringify({ model: 'deepseek-chat', messages: messages, max_tokens: 500, temperature: 0.8 })
+    body: JSON.stringify({ model: 'glm-4-flash', messages: messages, max_tokens: 500, temperature: 0.8 })
   });
   if (!resp.ok) {
     var errText = await resp.text();
@@ -1727,11 +1727,11 @@ function sendChat() {
     }).catch(function(e) {
       hideTyping();
       console.error('API error:', e);
-      addChatMsg('DeepSeek API 调用失败: ' + e.message, 'ai');
+      addChatMsg('智谱AI API 调用失败: ' + e.message, 'ai');
       addChatMsg(getReply(msg), 'ai');
       apiKey = '';
       if (apiKeyInput) apiKeyInput.value = '';
-      localStorage.removeItem('nexusai_deepseek_key');
+      localStorage.removeItem('nexusai_zhipu_key');
     });
   } else {
     setTimeout(function() {
